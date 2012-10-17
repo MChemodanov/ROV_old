@@ -1,6 +1,8 @@
+#define DEBUG
+
+#define rs485_pin A5
 #define ENGINE_COUNT 3
 #define REVERSE_PAUSE_MSEC 1000
-#define DEBUG
 
 class Engine
 {
@@ -25,17 +27,26 @@ void SetupEngine (int engineNum, int powerPin, int reversePin)
   digitalWrite(ENGINES[engineNum].reversePin, LOW);
 }
 
+void WriteRS485(char buf[], int count)
+{
+  digitalWrite(rs485_pin, HIGH);
+  for (int i=0; i<count; i++)
+    Serial.print(buf[i]);
+  delay(50); //without delay arduino cut mes
+  digitalWrite(rs485_pin, LOW);
+}
+
 void setup()  
 { 
   SetupEngine(0,6,7);
   SetupEngine(1,5,4);
   SetupEngine(2,3,2);
-  
-  Serial.begin(9600); 
 
-  pinMode(13, OUTPUT);   
+  pinMode(rs485_pin, OUTPUT);   
+  digitalWrite(rs485_pin, LOW);
+  Serial.begin(19200); 
 
-  Serial.println("SMTU ROV v 1.1 firmvare"); 
+  WriteRS485("SMTU ROV v 1.11 firmvare", 24); 
 } 
 
 char buffer[20];
@@ -64,8 +75,11 @@ void ParseReverseCmd(byte engineNum)
 
     analogWrite(ENGINES[engineNum].powerPin, ENGINES[engineNum].currentPower);
 #ifdef DEBUG
-  Serial.println("Reverse setted: ");
-  Serial.println(ENGINES[engineNum].reverseState);    
+  WriteRS485("R: ",3);
+  char buf[3];
+  itoa(ENGINES[engineNum].reverseState,buf,10);
+  WriteRS485(buf, 1);    
+  WriteRS485(". \n", 3);
 #endif
 }
 
@@ -88,8 +102,11 @@ void ParsePowerCmd(byte engineNum)
       ENGINES[engineNum].currentPower = val;         
 
 #ifdef DEBUG
-      Serial.println("Power setted: ");
-      Serial.println(val);    
+      WriteRS485("P: ", 13);
+      char buf[3];
+      itoa(val,buf,10);
+      WriteRS485(buf, charIndx - 3);   
+      WriteRS485(". \n", 3);
 #endif
     }
   } 
@@ -102,8 +119,11 @@ void ParseBuffer()
   if (engineNum < 0 || engineNum >= ENGINE_COUNT)
     return;  
 #ifdef DEBUG
-  Serial.println("Engine num: ");
-  Serial.println(engineNum);    
+  WriteRS485("Engine num: ", 12);
+  char buf[3];
+  itoa(engineNum,buf,10);
+  WriteRS485(buf,1);    
+  WriteRS485(". \n", 3);
 #endif       
   switch (buffer[1])
   {
