@@ -2,6 +2,8 @@
 #define ROBOTCONTROL_H
 
 #include <QTimer>
+#include <QVector>
+#include <QStringList>
 
 #include <QtAddOnSerialPort/serialport.h>
 #include <QtAddOnSerialPort/serialportinfo.h>
@@ -13,7 +15,7 @@ class RobotControl : QObject
     Q_OBJECT
 
 public:
-    RobotControl(int engines);
+    RobotControl(QString portName, int _engines, int _tickTime);
 
     ~RobotControl();
 
@@ -25,13 +27,22 @@ public:
 
     void StartWriting();
 
+    static QStringList GetPortNames();
+
 private:
     SerialPort serial;
-    QTimer* timer;
-    int engines;
-    int *newSpeed, *actualSpeed;
-    int *newReverse, *actualReverse;
-    int *ticksSinceLastReverse;
+    QTimer *timer;
+    int engines, tickTime,
+        ticksForReverse;
+
+    struct EngineData
+    {
+        QVector<int> newSpeed,
+                actualSpeed,
+                newReverse,
+                actualReverse,
+                ticksSinceLastReverse;
+    } ed;
 
     void WriteSpeed(int speed, int engine);
 

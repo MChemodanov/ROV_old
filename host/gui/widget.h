@@ -22,6 +22,10 @@ private slots:
 
     void on_checkBox_toggled(bool checked);
 
+    void on_comboBox_currentIndexChanged(const QString &arg1);
+
+    void on_spinBox_valueChanged(int arg1);
+
 private:
     Ui::Widget *ui;
     RobotControl *rc;

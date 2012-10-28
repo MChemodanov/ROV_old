@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>98</width>
-    <height>131</height>
+    <width>383</width>
+    <height>331</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,31 +19,80 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>90</y>
-     <width>81</width>
-     <height>20</height>
+     <y>80</y>
+     <width>232</width>
+     <height>201</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Reverse</string>
-   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>Reverse</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QDial" name="dial">
+      <property name="maximum">
+       <number>255</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QDial" name="dial">
+  <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>81</width>
-     <height>81</height>
+     <width>111</width>
+     <height>65</height>
     </rect>
    </property>
-   <property name="maximum">
-    <number>255</number>
+   <property name="title">
+    <string>COM-Port name</string>
    </property>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>20</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>112</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Engines number</string>
+   </property>
+   <widget class="QSpinBox" name="spinBox">
+    <property name="geometry">
+     <rect>
+      <x>15</x>
+      <y>20</y>
+      <width>81</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

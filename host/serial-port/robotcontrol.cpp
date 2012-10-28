@@ -1,46 +1,38 @@
 #include "robotcontrol.h"
+#include <QStringList>
+#include <qtconcurrentexception.h>
 
 #include <QtAddOnSerialPort/serialport.h>
 #include <QtAddOnSerialPort/serialportinfo.h>
 
-RobotControl::RobotControl(int engines)
+RobotControl::RobotControl(QString portName, int _engines, int _tickTime)
 {
-    this->engines = engines;
+    engines = _engines;
+    tickTime = _tickTime;
+    ticksForReverse = qRound(2000.0/tickTime + 0.5); //ceil((2 seconds)/(one tick))
 
     foreach (const SerialPortInfo &info, SerialPortInfo::availablePorts())
-    {
-        // Check name or something
-        serial.setPort(info);
-    }
+        if(info.portName() == portName)
+            serial.setPort(info);
 
-    timer = new QTimer();
+    timer = new QTimer(this);
 
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 
-    newSpeed = new int[engines];
-    actualSpeed = new int[engines];
-    newReverse = new int[engines];
-    actualReverse = new int[engines];
-    ticksSinceLastReverse = new int[engines];
-    for(int i = 0; i < engines; i++)
-    {
-        newSpeed[i] = 0;
-        actualSpeed[i] = 0;
-        newReverse[i] = 0;
-        actualReverse[i] = 0;
-        ticksSinceLastReverse[i] = 0;
-    }
+    ed.newSpeed.resize(engines);
+    ed.actualSpeed.resize(engines);
+    ed.newReverse.resize(engines);
+    ed.actualReverse.resize(engines);
+    ed.ticksSinceLastReverse.resize(engines);
 
     if(serial.open(QIODevice::ReadWrite))
-        timer->start(500);
+        timer->start(tickTime);
+    //else
+        //TODO: implement return codes because there are no exceptions in Qt
 }
 
 RobotControl::~RobotControl()
 {
-    delete newSpeed;
-    delete actualSpeed;
-    delete newReverse;
-    delete actualReverse;
     delete timer;
     serial.close();
 }
@@ -48,13 +40,13 @@ RobotControl::~RobotControl()
 void RobotControl::SetSpeed(int speed, int engine)
 {
     if (speed >= 0 && speed <= 255 && engine >= 0 && engine < engines)
-        newSpeed[engine] = speed;
+        ed.newSpeed[engine] = speed;
 }
 
 void RobotControl::SetReverse(int reverse, int engine)
 {
     if (engine >= 0 && engine < engines && reverse >= 0 && reverse <= 1)
-        newReverse[engine] = reverse;
+        ed.newReverse[engine] = reverse;
 }
 
 void RobotControl::WriteSpeed(int speed, int engine)
@@ -74,31 +66,40 @@ void RobotControl::WriteReverse(int reverse, int engine)
 void RobotControl::TimerTick()
 {
     for(int i = 0; i < engines; i++)
-        ticksSinceLastReverse[i]++;
+        ed.ticksSinceLastReverse[i]++;
 
     for (int i = 0; i < engines; i++)
     {
-        if (newSpeed[i] != actualSpeed[i])
+        if (ed.newSpeed[i] != ed.actualSpeed[i])
         {
-            actualSpeed[i] = newSpeed[i];
-            WriteSpeed(actualSpeed[i], i);
+            ed.actualSpeed[i] = ed.newSpeed[i];
+            WriteSpeed(ed.actualSpeed[i], i);
         }
-        if (ticksSinceLastReverse[i] >= 4 && newReverse[i] != actualReverse[i])
+        if (ed.ticksSinceLastReverse[i] >= ticksForReverse &&
+                ed.newReverse[i] != ed.actualReverse[i])
         {
-            ticksSinceLastReverse[i] = 0;
-            actualReverse[i] = newReverse[i];
-            WriteReverse(actualReverse[i], i);
+            ed.ticksSinceLastReverse[i] = 0;
+            ed.actualReverse[i] = ed.newReverse[i];
+            WriteReverse(ed.actualReverse[i], i);
         }
     }
 }
 
 void RobotControl::StartWriting()
 {
-    timer->start(500);
+    timer->start(tickTime);
 }
 
 void RobotControl::StopWriting()
 {
     timer->stop();
+}
+
+QStringList RobotControl::GetPortNames()
+{
+    QStringList list;
+    foreach(const SerialPortInfo &info, SerialPortInfo::availablePorts())
+        list.insert(0, info.portName());
+    return list;
 }
 
