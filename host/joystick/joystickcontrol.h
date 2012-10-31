@@ -19,7 +19,7 @@ public:
 
 private:
     int oldX, oldY, oldZ;
-    QTimer *timer;
+    QTimer timer;
     SDL_Joystick *joystick;
 
 signals:

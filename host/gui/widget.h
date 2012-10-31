@@ -31,13 +31,15 @@ private slots:
 
     void on_verticalSlider_valueChanged(int value);
 
+    void on_comboBox_2_currentIndexChanged(const QString &arg1);
+
 public slots:
     void joystick_axisChanged(int arg1, int arg2, int arg3);
 
 private:
     Ui::Widget *ui;
-    RobotControl *rc;
-    JoystickControl *jc;
+    RobotControl rc;
+    JoystickControl jc;
     bool rRev, lRev, vRev;
 };
 

@@ -15,9 +15,11 @@ class RobotControl : QObject
     Q_OBJECT
 
 public:
-    RobotControl(QString portName, int _engines, int _tickTime);
+    explicit RobotControl(QObject *parent = 0);
 
     ~RobotControl();
+
+    int Initialize(QString portName, int _engines, int _tickTime);
 
     void SetSpeed(int speed, int engine);
 
@@ -31,7 +33,7 @@ public:
 
 private:
     SerialPort serial;
-    QTimer *timer;
+    QTimer timer;
     int engines, tickTime,
         ticksForReverse;
 

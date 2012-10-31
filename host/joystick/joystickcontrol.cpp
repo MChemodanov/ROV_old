@@ -7,13 +7,12 @@ JoystickControl::JoystickControl(QObject *parent) :
     oldY(0),
     oldZ(0)
 {
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 }
 
 JoystickControl::~JoystickControl()
 {
-    delete timer;
+
 }
 
 int JoystickControl::Initialize(QString joystickName, int updateTime)
@@ -25,10 +24,10 @@ int JoystickControl::Initialize(QString joystickName, int updateTime)
             if (SDL_JoystickName(i) == joystickName)
             {
                 joystick = SDL_JoystickOpen(i);
+                timer.start(updateTime);
                 flag = 1;
             }
     }
-    timer->start(updateTime);
     return flag;
 }
 
