@@ -18,12 +18,16 @@ public:
     static QStringList GetJoystickNames();
 
 private:
-    int oldX, oldY, oldZ;
+    int buttons,
+        oldX, oldY, oldZ;
+    bool *buttonStates;
     QTimer timer;
     SDL_Joystick *joystick;
 
 signals:
     void axisEvent(int arg1, int arg2, int arg3);
+
+    void buttonEvent(int buttodId, bool state);
     
 private slots:
     void TimerTick();

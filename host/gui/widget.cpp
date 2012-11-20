@@ -8,6 +8,7 @@
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget),
+    joystickEnabled(false),
     rRev(false),
     lRev(false),
     vRev(false)
@@ -17,21 +18,22 @@ Widget::Widget(QWidget *parent) :
     ui->comboBox->addItems(RobotControl::GetPortNames());
     ui->comboBox_2->addItems(JoystickControl::GetJoystickNames());
 
-    //rc = new RobotControl(this);
-    if(RobotControl::GetPortNames().length() < 1)
-        QMessageBox::warning(this, "Error", "No COM ports available!");
-    else
-        if(rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500) < 0)
+    //if(RobotControl::GetPortNames().length() < 1)
+     //   QMessageBox::warning(this, "Error", "No COM ports available!");
+    //else
+        if(rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open COM port!");
 
-    //jc = new JoystickControl(this);
     connect(&jc, SIGNAL(axisEvent(int,int,int)), this, SLOT(joystick_axisChanged(int,int,int)));
+    connect(&jc, SIGNAL(buttonEvent(int,bool)), this, SLOT(joystick_buttonPressed(int,bool)));
 
     if(JoystickControl::GetJoystickNames().length() < 1)
         QMessageBox::warning(this, "Error", "No joysticks available!");
     else
-        if(jc.Initialize(ui->comboBox_2->currentText(), 100) < 0)
+        if(jc.Initialize(ui->comboBox_2->currentText(), 50) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open joystick!");
+    connect(&timer, SIGNAL(timeout()), this, SLOT(timer_tick()));
+    timer.start(50);
 }
 
 Widget::~Widget()
@@ -41,174 +43,108 @@ Widget::~Widget()
 
 void Widget::joystick_axisChanged(int arg1, int arg2, int arg3)
 {
-    int x = arg1 * 255 / 32768,
-        y =  - arg2 * 255 / 32768,
-        z = arg3 * 255 / 32768;
-    ui->verticalSlider_2->setValue(y);
-    ui->verticalSlider->setValue(z);
-    ui->horizontalSlider->setValue(x);
+    if(joystickEnabled)
+    {
+        int x = arg1 * 255 / 32768,
+            y =  - arg2 * 255 / 32768,
+            z = arg3 * 255 / 32768;
+        ui->verticalSlider_2->setValue(y);
+        ui->verticalSlider->setValue(z);
+        ui->horizontalSlider->setValue(x);
+    }
+}
+
+void Widget::joystick_buttonPressed(int buttonId, bool state)
+{
+    switch(buttonId)
+    {
+        case 0:
+        {
+            rc.SetHalt(state);
+            ui->checkBox_3->setChecked(state);
+            break;
+        }
+        case 1:
+        {
+            if(state)
+            {
+                if(rc.EnginesStarted())
+                {
+                    rc.StopEngines();
+                    ui->checkBox_2->setChecked(true);
+                }
+                else
+                {
+                    rc.StartEngines();
+                    ui->checkBox_2->setChecked(false);
+                }
+            }
+            break;
+        }
+        default:
+        {
+            qDebug() << "ID: " << buttonId << " State: " << state;
+        }
+    }
 }
 
 void Widget::on_comboBox_currentIndexChanged(const QString &arg1)
 {
-    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
+    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200);
 }
 
 void Widget::on_spinBox_valueChanged(int arg1)
 {
-    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
+    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200);
 }
 
 void Widget::on_checkBox_stateChanged(int arg1)
 {
+    joystickEnabled = arg1;
     ui->verticalSlider->setEnabled(!arg1);
     ui->verticalSlider_2->setEnabled(!arg1);
     ui->horizontalSlider->setEnabled(!arg1);
+    ui->checkBox_2->setEnabled(!arg1);
+    ui->checkBox_3->setEnabled(!arg1);
 }
 
 void Widget::on_verticalSlider_2_valueChanged(int value)
 {
-    int rSpeed = value, lSpeed = value;
-    if(ui->horizontalSlider->value() != 0)
-    {
-        double coeff = ui->horizontalSlider->value() * 1.0 / ui->horizontalSlider->maximum();
-        if(ui->horizontalSlider->value() > 0)
-        {
-            rSpeed = qRound(rSpeed * (1.0 - coeff));
-        }
-        else
-        {
-            lSpeed = qRound(lSpeed * (1.0 - qAbs(coeff)));
-        }
-    }
-    if (value != 0)
-        if(value > 0)
-        {
-            rc.SetSpeed(rSpeed, 1);
-            rc.SetReverse(0, 1);
-            rRev = false;
-            rc.SetSpeed(lSpeed, 2);
-            rc.SetReverse(0, 2);
-            lRev = false;
-        }
-        else
-        {
-            rc.SetSpeed(qAbs(rSpeed), 1);
-            rc.SetReverse(1, 1);
-            rRev = true;
-            rc.SetSpeed(qAbs(lSpeed), 2);
-            rc.SetReverse(1, 2);
-            lRev = true;
-        }
-
-    else
-    {
-        if(value > 0)
-        {
-            rc.SetSpeed(ui->horizontalSlider->value(), 1);
-            rc.SetReverse(1, 1);
-            rRev = true;
-            rc.SetSpeed(ui->horizontalSlider->value(), 2);
-            rc.SetReverse(0, 2);
-            lRev = false;
-            lSpeed = rSpeed = ui->horizontalSlider->value();
-        }
-        else
-        {
-            rc.SetSpeed(ui->horizontalSlider->value(), 1);
-            rc.SetReverse(0, 1);
-            rRev = false;
-            rc.SetSpeed(ui->horizontalSlider->value(), 2);
-            rc.SetReverse(1, 2);
-            lRev = true;
-            lSpeed = rSpeed = ui->horizontalSlider->value();
-        }
-    }
-    ui->label_5->setText("Right: " + QString(rRev?"R":"") + QString::number(qAbs(rSpeed)));
-    ui->label_6->setText("Left: " + QString(lRev?"R":"") + QString::number(qAbs(lSpeed)));
+    rc.SetMoveSpeed(value);
 }
 
 void Widget::on_horizontalSlider_valueChanged(int value)
 {
-    int rSpeed = ui->verticalSlider_2->value(),
-            lSpeed = ui->verticalSlider_2->value();
-    if(value != 0)
-    {
-        double coeff = value * 1.0 / ui->horizontalSlider->maximum();
-        if(value > 0)
-        {
-            rSpeed = qRound(rSpeed * (1.0 - coeff));
-        }
-        else
-        {
-            lSpeed = qRound(lSpeed * (1.0 - qAbs(coeff)));
-        }
-    }
-    if(ui->verticalSlider_2->value() != 0)
-        if(ui->verticalSlider_2->value() > 0)
-        {
-            rc.SetSpeed(rSpeed, 1);
-            rc.SetReverse(0, 1);
-            rRev = false;
-            rc.SetSpeed(lSpeed, 2);
-            rc.SetReverse(0, 2);
-            lRev = false;
-        }
-        else
-        {
-            rc.SetSpeed(qAbs(rSpeed), 1);
-            rc.SetReverse(1, 1);
-            rRev = true;
-            rc.SetSpeed(qAbs(lSpeed), 2);
-            rc.SetReverse(1, 2);
-            lRev = true;
-        }
-    else
-    {
-        if(value > 0)
-        {
-            rc.SetSpeed(value, 1);
-            rc.SetReverse(1, 1);
-            rRev = true;
-            rc.SetSpeed(value, 2);
-            rc.SetReverse(0, 2);
-            lRev = false;
-            lSpeed = rSpeed = value;
-        }
-        else
-        {
-            rc.SetSpeed(value, 1);
-            rc.SetReverse(0, 1);
-            rRev = false;
-            rc.SetSpeed(value, 2);
-            rc.SetReverse(1, 2);
-            lRev = true;
-            lSpeed = rSpeed = value;
-        }
-    }
-    ui->label_5->setText("Right: " + QString(rRev?"R":"") + QString::number(qAbs(rSpeed)));
-    ui->label_6->setText("Left: " + QString(lRev?"R":"") + QString::number(qAbs(lSpeed)));
+    rc.SetRotateSpeed(value);
 }
 
 void Widget::on_verticalSlider_valueChanged(int value)
 {
-    if(value >= 0)
-    {
-        rc.SetSpeed(value, 0);
-        rc.SetReverse(0, 0);
-        vRev = false;
-    }
-    else
-    {
-        rc.SetSpeed(qAbs(value), 0);
-        rc.SetReverse(1, 0);
-        vRev = true;
-    }
-    ui->label_7->setText("Vertical: " + QString(vRev?"R":"") + QString::number(qAbs(value)));
+    rc.SetVerticalSpeed(value);
+}
+
+void Widget::timer_tick()
+{
+    ui->label_7->setText("Vertical: " + QString(rc.GetReverse(0)?"R":"") + QString::number(rc.GetSpeed(0)));
+    ui->label_5->setText("Right: " + QString(rc.GetReverse(1)?"R":"") + QString::number(rc.GetSpeed(1)));
+    ui->label_6->setText("Left: " + QString(rc.GetReverse(2)?"R":"") + QString::number(rc.GetSpeed(2)));
 }
 
 void Widget::on_comboBox_2_currentIndexChanged(const QString &arg1)
 {
     if(! jc.Initialize(arg1, 100) > 0)
         QMessageBox::warning(this, "Error", "Couldn't open joystick!");
+}
+
+void Widget::on_checkBox_2_toggled(bool checked)
+{
+    if(checked)
+        rc.StopEngines();
+    else
+        rc.StartEngines();
+}
+
+void Widget::on_checkBox_3_toggled(bool checked)
+{
+    rc.SetHalt(checked);
 }

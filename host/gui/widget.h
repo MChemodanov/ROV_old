@@ -33,14 +33,24 @@ private slots:
 
     void on_comboBox_2_currentIndexChanged(const QString &arg1);
 
+    void on_checkBox_2_toggled(bool checked);
+
+    void on_checkBox_3_toggled(bool checked);
+
 public slots:
     void joystick_axisChanged(int arg1, int arg2, int arg3);
 
+    void joystick_buttonPressed(int buttonId, bool state);
+
+    void timer_tick();
+
 private:
+    QTimer timer;
     Ui::Widget *ui;
     RobotControl rc;
     JoystickControl jc;
-    bool rRev, lRev, vRev;
+    bool joystickEnabled,
+            rRev, lRev, vRev;
 };
 
 #endif // WIDGET_H

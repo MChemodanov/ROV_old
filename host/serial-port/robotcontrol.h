@@ -21,9 +21,17 @@ public:
 
     int Initialize(QString portName, int _engines, int _tickTime);
 
-    void SetSpeed(int speed, int engine);
+    void SetVerticalSpeed(int value);
 
-    void SetReverse(int reverse, int engine);
+    void SetMoveSpeed(int value);
+
+    void SetRotateSpeed(int value);
+
+    void SetHalt(bool state);
+
+    void StartEngines();
+
+    void StopEngines();
 
     void StopWriting();
 
@@ -31,11 +39,25 @@ public:
 
     static QStringList GetPortNames();
 
+    int GetSpeed(int engine);
+
+    bool GetReverse(int engine);
+
+    bool GetHalt();
+
+    bool EnginesStarted();
+
 private:
     SerialPort serial;
     QTimer timer;
     int engines, tickTime,
-        ticksForReverse;
+        ticksForReverse,
+        lastEngine;
+    int vertSpeed,
+        moveSpeed,
+        rotateSpeed;
+    bool halt,
+            enginesStarted;
 
     struct EngineData
     {
@@ -46,9 +68,15 @@ private:
                 ticksSinceLastReverse;
     } ed;
 
+    void CalcEnginesData();
+
     void WriteSpeed(int speed, int engine);
 
     void WriteReverse(int reverse, int engine);
+
+    void SetSpeed(int speed, int engine);
+
+    void SetReverse(int reverse, int engine);
 
 private slots:
     void TimerTick();

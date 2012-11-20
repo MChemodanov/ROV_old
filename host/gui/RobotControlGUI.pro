@@ -8,6 +8,7 @@ INCLUDEPATH += ..\
 CONFIG += serialport
 
 LIBS += -lSDL
+#LIBS += libSerialPort
 
 SOURCES += *.cpp \
     ../serial-port/robotcontrol.cpp \
