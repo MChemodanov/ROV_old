@@ -9,20 +9,22 @@ Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget),
     joystickEnabled(false),
-    rRev(false),
-    lRev(false),
-    vRev(false)
+    initialized(false)
 {
     ui->setupUi(this);
 
     ui->comboBox->addItems(RobotControl::GetPortNames());
     ui->comboBox_2->addItems(JoystickControl::GetJoystickNames());
 
-    //if(RobotControl::GetPortNames().length() < 1)
-     //   QMessageBox::warning(this, "Error", "No COM ports available!");
-    //else
-        if(rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200) < 0)
+    if(RobotControl::GetPortNames().length() < 1)
+        QMessageBox::warning(this, "Error", "No COM ports available!");
+    else
+    {
+        if(rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 250) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open COM port!");
+    else
+            initialized = true;
+    }
 
     connect(&jc, SIGNAL(axisEvent(int,int,int)), this, SLOT(joystick_axisChanged(int,int,int)));
     connect(&jc, SIGNAL(buttonEvent(int,bool)), this, SLOT(joystick_buttonPressed(int,bool)));
@@ -90,12 +92,14 @@ void Widget::joystick_buttonPressed(int buttonId, bool state)
 
 void Widget::on_comboBox_currentIndexChanged(const QString &arg1)
 {
-    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200);
+    if(initialized)
+        rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
 }
 
 void Widget::on_spinBox_valueChanged(int arg1)
 {
-    rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 200);
+    if(initialized)
+        rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
 }
 
 void Widget::on_checkBox_stateChanged(int arg1)

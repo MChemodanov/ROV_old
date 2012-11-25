@@ -11,6 +11,7 @@ RobotControl::RobotControl(QObject *parent) :
     moveSpeed(0),
     rotateSpeed(0),
     halt(false),
+    initialized(false),
     enginesStarted(true)
 {
     lastEngine = 0;
@@ -34,13 +35,12 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
             serial.setPort(info);
             flag = 1;
         }
-    //if(flag < 0)
-        //return flag;
+    if(flag < 0)
+        return flag;
 
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 
     ed.newSpeed.resize(engines);
-    ed.newSpeed.push_back(0);
     ed.actualSpeed.resize(engines);
     ed.newReverse.resize(engines);
     ed.actualReverse.resize(engines);
@@ -49,6 +49,7 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
 
     if(!serial.open(QIODevice::ReadWrite))
         return -1;
+    initialized = true;
     return 1;
 }
 
@@ -166,10 +167,10 @@ void RobotControl::TimerTick()
         if(lastEngine >= engines)
             lastEngine = 0;
 
-        if (ed.ticksSinceLastReverse[lastEngine] >= ticksForReverse &&
-                ed.newReverse[lastEngine] != ed.actualReverse[lastEngine])
+        if (ed.ticksSinceLastReverse[1] >= ticksForReverse)// &&
+                //ed.newReverse[lastEngine] != ed.actualReverse[lastEngine])
         {
-            ed.ticksSinceLastReverse[lastEngine] = 0;
+            ed.ticksSinceLastReverse[1] = 0;
             ed.actualReverse[lastEngine] = ed.newReverse[lastEngine];
             WriteReverse(ed.actualReverse[lastEngine], lastEngine);
         }else
@@ -200,6 +201,7 @@ QStringList RobotControl::GetPortNames()
 
 int RobotControl::GetSpeed(int engine)
 {
+    if(!initialized)return 0;
     if(!ed.actualSpeed.isEmpty())
         return ed.actualSpeed[engine];
     else return 0;
@@ -207,6 +209,7 @@ int RobotControl::GetSpeed(int engine)
 
 bool RobotControl::GetReverse(int engine)
 {
+    if(!initialized)return false;
     if(!ed.actualReverse.isEmpty())
         return ed.actualReverse[engine];
     else return false;
@@ -214,10 +217,12 @@ bool RobotControl::GetReverse(int engine)
 
 bool RobotControl::GetHalt()
 {
+    if(!initialized)return false;
     return halt;
 }
 
 bool RobotControl::EnginesStarted()
 {
+    if(!initialized)return false;
     return enginesStarted;
 }

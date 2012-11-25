@@ -50,7 +50,7 @@ private:
     RobotControl rc;
     JoystickControl jc;
     bool joystickEnabled,
-            rRev, lRev, vRev;
+            initialized;
 };
 
 #endif // WIDGET_H

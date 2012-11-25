@@ -57,6 +57,7 @@ private:
         moveSpeed,
         rotateSpeed;
     bool halt,
+            initialized,
             enginesStarted;
 
     struct EngineData
