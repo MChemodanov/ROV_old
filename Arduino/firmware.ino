@@ -19,6 +19,7 @@ public:
   byte powerPin;
   byte currentPower;
   byte reverseState;
+  unsigned long reverseEndTime;
 };
 
 Engine ENGINES[ENGINE_COUNT];
@@ -29,6 +30,7 @@ void SetupEngine (int engineNum, int powerPin, int reversePin)
   ENGINES[engineNum].reversePin = reversePin;
   ENGINES[engineNum].currentPower = 0;
   ENGINES[engineNum].reverseState = 0;
+  ENGINES[engineNum].reverseEndTime = 0;
 
   pinMode(reversePin, OUTPUT);   
   analogWrite(ENGINES[engineNum].powerPin, 0); 
@@ -73,18 +75,18 @@ void ParseReverseCmd(byte engineNum)
 
   if (reverseState != ENGINES[engineNum].reverseState)
   {
+    ENGINES[engineNum].reverseState = reverseState;
+
     analogWrite(ENGINES[engineNum].powerPin, 0); 
-    delay(REVERSE_PAUSE_MSEC);
+
+    if (reverseState == 1)
+      digitalWrite(ENGINES[engineNum].reversePin, HIGH);
+    else 
+      digitalWrite(ENGINES[engineNum].reversePin, LOW);
+
+    ENGINES[engineNum].reverseEndTime = millis() + REVERSE_PAUSE_MSEC;
   }
 
-  ENGINES[engineNum].reverseState = reverseState;
-
-  if (reverseState == 1)
-    digitalWrite(ENGINES[engineNum].reversePin, HIGH);
-  else 
-    digitalWrite(ENGINES[engineNum].reversePin, LOW);
-
-    analogWrite(ENGINES[engineNum].powerPin, ENGINES[engineNum].currentPower);
 #ifdef DEBUG
   WriteRS485("R: ",3);
   char buf[3];
@@ -109,8 +111,10 @@ void ParsePowerCmd(byte engineNum)
       
     if (0 <= val && val <= 255)
     {
-      analogWrite(ENGINES[engineNum].powerPin, val);
-      ENGINES[engineNum].currentPower = val;         
+	  if (ENGINES[engineNum].reverseEndTime == 0)
+		analogWrite(ENGINES[engineNum].powerPin, val);
+      
+	  ENGINES[engineNum].currentPower = val;         
 
 #ifdef DEBUG
       WriteRS485("P: ", 13);
@@ -166,12 +170,29 @@ void ReadCommand()
     }
     else
       charIndx = 0;
+	ReverseCheck();
   }
 }
 
+void ReverseCheck()
+{
+  unsigned long currentMillis = millis();
+  for (byte i = 0; i < ENGINE_COUNT; i++)
+  {
+    if ( ENGINES[i].reverseEndTime != 0 && currentMillis >= ENGINES[i].reverseEndTime)
+    {
+        digitalWrite(rs485_pin, HIGH);
+        Serial.println(currentMillis-ENGINES[i].reverseEndTime);
+        digitalWrite(rs485_pin, LOW);
+        
+	analogWrite(ENGINES[i].powerPin, ENGINES[i].currentPower);	
+	ENGINES[i].reverseEndTime = 0;
+    }		
+  }
+}
 
 void loop()  
 {
+  ReverseCheck();
   ReadCommand(); 
 }
-
