@@ -1,8 +1,16 @@
+#include <Ethernet.h>
+#include <SPI.h>
+
 #define DEBUG
 
 #define rs485_pin A5
 #define ENGINE_COUNT 3
 #define REVERSE_PAUSE_MSEC 1000
+
+byte mac[] = { 
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 2, 2);
+EthernetServer server(80);
 
 class Engine
 {
@@ -45,6 +53,9 @@ void setup()
   pinMode(rs485_pin, OUTPUT);   
   digitalWrite(rs485_pin, LOW);
   Serial.begin(19200); 
+  
+  Ethernet.begin(mac, ip);
+  server.begin();
 
   WriteRS485("SMTU ROV v 1.11 firmvare", 24); 
 } 
@@ -134,11 +145,12 @@ void ParseBuffer()
 
 void ReadCommand()
 {
-  while (Serial.available() > 0) 
+  EthernetClient client = server.available();
+  while (client.available() > 0) 
   {
     if(charIndx < 19) // One less than the size of the array
     {
-      inChar = Serial.read(); 
+      inChar = client.read(); 
 
       if (inChar == '#')
         charIndx = 0;
