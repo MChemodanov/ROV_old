@@ -43,15 +43,6 @@ void SetupEngine (int engineNum, int powerPin, int reversePin)
   digitalWrite(ENGINES[engineNum].reversePin, LOW);
 }
 
-void WriteRS485(char buf[], int count)
-{
-  digitalWrite(rs485_pin, HIGH);
-  for (int i=0; i<count; i++)
-    Serial.print(buf[i]);
-  delay(50); //without delay arduino cut mes
-  digitalWrite(rs485_pin, LOW);
-}
-
 void setup()  
 { 
   SetupEngine(0,6,7);
@@ -69,7 +60,7 @@ void setup()
   compass.init();
   compass.enableDefault();
 
-  WriteRS485("SMTU ROV v 1.11 firmvare\n", 25); 
+  Serial.print("SMTU ROV v 1.11 firmvare\n"); 
 } 
 
 char buffer[20];
@@ -78,6 +69,8 @@ byte charIndx = 0;
 
 void ParseReverseCmd(byte engineNum)
 {
+  if (engineNum < 0 || engineNum >= ENGINE_COUNT)
+    return;  
   byte reverseState = buffer[3] - '0';
  
   if (reverseState != 1 && reverseState != 0)
@@ -98,16 +91,19 @@ void ParseReverseCmd(byte engineNum)
   }
 
 #ifdef DEBUG
-  WriteRS485("R: ",3);
-  char buf[3];
-  itoa(ENGINES[engineNum].reverseState,buf,10);
-  WriteRS485(buf, 1);    
-  WriteRS485(". \n", 3);
+  Serial.print("Engine num: ");
+  Serial.print(engineNum);    
+  Serial.print(". \n");
+  Serial.print("R: ");
+  Serial.print((int)ENGINES[engineNum].reverseState);
+  Serial.print(". \n");
 #endif
 }
 
 void ParsePowerCmd(byte engineNum)
 {
+  if (engineNum < 0 || engineNum >= ENGINE_COUNT)
+    return;  
   if (charIndx <= 6)
   {
     int val = 0;
@@ -127,11 +123,12 @@ void ParsePowerCmd(byte engineNum)
 	  ENGINES[engineNum].currentPower = val;         
 
 #ifdef DEBUG
-      WriteRS485("P: ", 13);
-      char buf[3];
-      itoa(val,buf,10);
-      WriteRS485(buf, charIndx - 3);   
-      WriteRS485(". \n", 3);
+      Serial.print("Engine num: ");
+      Serial.print(engineNum);    
+      Serial.print(". \n");
+      Serial.print("R: ");
+      Serial.print(val);
+      Serial.print('\n');
 #endif
     }
   } 
@@ -164,15 +161,7 @@ void SendMagnetometerData()
 void ParseBuffer()
 {
   byte engineNum = buffer[2] - '0';
-  /*if (engineNum < 0 || engineNum >= ENGINE_COUNT)
-  //  return;  
-#ifdef DEBUG
-  WriteRS485("Engine num: ", 12);
-  char buf[3];
-  itoa(engineNum,buf,10);
-  WriteRS485(buf,1);    
-  WriteRS485(". \n", 3);
-#endif    */   
+  
   switch (buffer[1])
   {
     case 'r' : ParseReverseCmd(engineNum); break;
