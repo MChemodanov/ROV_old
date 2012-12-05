@@ -149,10 +149,22 @@ void SendAccelerometerData()
    client.println((int)compass.a.z);   
 }
 
+void SendMagnetometerData()
+{
+   compass.read();
+   
+   client.print("X ");
+   client.print((int)compass.m.x);
+   client.print(" Y: ");
+   client.print((int)compass.m.y);
+   client.print(" Z: ");
+   client.println((int)compass.m.z);   
+}
+
 void ParseBuffer()
 {
   byte engineNum = buffer[2] - '0';
-  //if (engineNum < 0 || engineNum >= ENGINE_COUNT)
+  /*if (engineNum < 0 || engineNum >= ENGINE_COUNT)
   //  return;  
 #ifdef DEBUG
   WriteRS485("Engine num: ", 12);
@@ -160,13 +172,13 @@ void ParseBuffer()
   itoa(engineNum,buf,10);
   WriteRS485(buf,1);    
   WriteRS485(". \n", 3);
-#endif       
+#endif    */   
   switch (buffer[1])
   {
     case 'r' : ParseReverseCmd(engineNum); break;
     case 'p' : ParsePowerCmd(engineNum); break; 
     case 'a' : SendAccelerometerData(); break;
-    //case 'm' : SendMagnitometerData(); break;
+    case 'm' : SendMagnetometerData(); break;
   }
 }
 
