@@ -1,4 +1,4 @@
-QT += core gui
+QT += core gui network
 
 TARGET = RobotControlGUI
 TEMPLATE = app

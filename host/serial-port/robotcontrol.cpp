@@ -1,6 +1,6 @@
 #include "robotcontrol.h"
 #include <QStringList>
-#include <qtconcurrentexception.h>
+#include <QtNetwork/QTcpSocket>
 
 #include <QtAddOnSerialPort/serialport.h>
 #include <QtAddOnSerialPort/serialportinfo.h>
@@ -19,7 +19,8 @@ RobotControl::RobotControl(QObject *parent) :
 
 RobotControl::~RobotControl()
 {
-    serial.close();
+    //serial.close();
+    socket.close();
 }
 
 int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
@@ -28,7 +29,7 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
     tickTime = _tickTime;
     ticksForReverse = qRound(2000.0/tickTime + 0.5); //ceil((2 seconds)/(one tick))
 
-    int flag = -1;
+/*    int flag = -1;
     foreach (const SerialPortInfo &info, SerialPortInfo::availablePorts())
         if(info.portName() == portName)
         {
@@ -36,7 +37,7 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
             flag = 1;
         }
     if(flag < 0)
-        return flag;
+        return flag;*/
 
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 
@@ -47,8 +48,9 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
     ed.ticksSinceLastReverse.resize(engines);
     timer.start(tickTime);
 
-    if(!serial.open(QIODevice::ReadWrite))
-        return -1;
+    //if(!serial.open(QIODevice::ReadWrite))
+    socket.connectToHost("192.168.2.2", 80);
+        //return -1;
     initialized = true;
     return 1;
 }
@@ -146,15 +148,19 @@ void RobotControl::SetReverse(int reverse, int engine)
 void RobotControl::WriteSpeed(int speed, int engine)
 {
     QString toWrite = "#p" + QString::number(engine) + QString::number(speed) + '!';
-    if(serial.isWritable())
-        serial.write(toWrite.toStdString().c_str());
+    //if(serial.isWritable())
+      //  serial.write(toWrite.toStdString().c_str());
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
 }
 
 void RobotControl::WriteReverse(int reverse, int engine)
 {
     QString toWrite ="#r" + QString::number(engine) + QString::number(reverse) + '!';
-    if(serial.isWritable() && engine >= 0 && reverse >= 0 && reverse <=1)
-        serial.write(toWrite.toStdString().c_str());
+    //if(serial.isWritable() && engine >= 0 && reverse >= 0 && reverse <=1)
+      //  serial.write(toWrite.toStdString().c_str());
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
 }
 
 void RobotControl::TimerTick()

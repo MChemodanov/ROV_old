@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QVector>
 #include <QStringList>
+#include <QtNetwork/QTcpSocket>
 
 #include <QtAddOnSerialPort/serialport.h>
 #include <QtAddOnSerialPort/serialportinfo.h>
@@ -48,7 +49,8 @@ public:
     bool EnginesStarted();
 
 private:
-    SerialPort serial;
+    //SerialPort serial;
+    QTcpSocket socket;
     QTimer timer;
     int engines, tickTime,
         ticksForReverse,
