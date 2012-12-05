@@ -1,5 +1,7 @@
 #include <Ethernet.h>
 #include <SPI.h>
+#include <Wire.h>
+#include <LSM303.h>
 
 #define DEBUG
 
@@ -11,6 +13,10 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168, 2, 2);
 EthernetServer server(80);
+
+EthernetClient client;
+
+LSM303 compass;
 
 class Engine
 {
@@ -58,8 +64,12 @@ void setup()
   
   Ethernet.begin(mac, ip);
   server.begin();
+  
+  Wire.begin();
+  compass.init();
+  compass.enableDefault();
 
-  WriteRS485("SMTU ROV v 1.11 firmvare", 24); 
+  WriteRS485("SMTU ROV v 1.11 firmvare\n", 25); 
 } 
 
 char buffer[20];
@@ -127,12 +137,23 @@ void ParsePowerCmd(byte engineNum)
   } 
 }
 
+void SendAccelerometerData()
+{
+   compass.read();
+   
+   client.print("X ");
+   client.print((int)compass.a.x);
+   client.print(" Y: ");
+   client.print((int)compass.a.y);
+   client.print(" Z: ");
+   client.println((int)compass.a.z);   
+}
 
 void ParseBuffer()
 {
   byte engineNum = buffer[2] - '0';
-  if (engineNum < 0 || engineNum >= ENGINE_COUNT)
-    return;  
+  //if (engineNum < 0 || engineNum >= ENGINE_COUNT)
+  //  return;  
 #ifdef DEBUG
   WriteRS485("Engine num: ", 12);
   char buf[3];
@@ -144,12 +165,15 @@ void ParseBuffer()
   {
     case 'r' : ParseReverseCmd(engineNum); break;
     case 'p' : ParsePowerCmd(engineNum); break; 
+    case 'a' : SendAccelerometerData(); break;
+    //case 'm' : SendMagnitometerData(); break;
   }
 }
 
 void ReadCommand()
 {
-  EthernetClient client = server.available();
+  if(!client.connected())
+    client = server.available();
   while (client.available() > 0) 
   {
     if(charIndx < 19) // One less than the size of the array
