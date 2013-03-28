@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "serial-port/robotcontrol.h"
+#include "serial-port/sixenginesrc.h"
 #include "joystick/joystickcontrol.h"
 
 namespace Ui {
@@ -19,9 +20,6 @@ public:
     ~Widget();
 
 private slots:
-    void on_comboBox_currentIndexChanged(const QString &arg1);
-
-    void on_spinBox_valueChanged(int arg1);
 
     void on_checkBox_stateChanged(int arg1);
 
@@ -37,6 +35,8 @@ private slots:
 
     void on_checkBox_3_toggled(bool checked);
 
+    void on_connectBtn_clicked();
+
 public slots:
     void joystick_axisChanged(int arg1, int arg2, int arg3);
 
@@ -47,7 +47,7 @@ public slots:
 private:
     QTimer timer;
     Ui::Widget *ui;
-    RobotControl rc;
+    SixEnginesRC rc;
     JoystickControl jc;
     bool joystickEnabled,
             initialized;

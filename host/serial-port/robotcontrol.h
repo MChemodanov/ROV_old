@@ -20,7 +20,7 @@ public:
 
     ~RobotControl();
 
-    int Initialize(QString portName, int _engines, int _tickTime);
+    int Initialize(QString address, int port, int _engines, int _tickTime);
 
     void SetVerticalSpeed(int value);
 
@@ -28,7 +28,11 @@ public:
 
     void SetRotateSpeed(int value);
 
+    void SetPitchSpeed(int value);
+
     void SetHalt(bool state);
+
+    void SetPitching(bool state);
 
     void StartEngines();
 
@@ -48,7 +52,7 @@ public:
 
     bool EnginesStarted();
 
-private:
+protected:
     //SerialPort serial;
     QTcpSocket socket;
     QTimer timer;
@@ -57,10 +61,9 @@ private:
         lastEngine;
     int vertSpeed,
         moveSpeed,
-        rotateSpeed;
-    bool halt,
-            initialized,
-            enginesStarted;
+        rotateSpeed,
+        pitchSpeed;
+    bool initialized;
 
     struct EngineData
     {
@@ -69,9 +72,20 @@ private:
                 newReverse,
                 actualReverse,
                 ticksSinceLastReverse;
+        QVector<double> angle,
+                        coeff;
     } ed;
 
-    void CalcEnginesData();
+    enum State
+    {
+        Stop,
+        Move,
+        Yaw,
+        Pitch,
+        Roll
+    } currentState;
+
+    virtual void CalcEnginesData();
 
     void WriteSpeed(int speed, int engine);
 

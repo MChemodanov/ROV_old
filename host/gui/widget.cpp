@@ -13,18 +13,7 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->comboBox->addItems(RobotControl::GetPortNames());
-    ui->comboBox_2->addItems(JoystickControl::GetJoystickNames());
-
-    if(RobotControl::GetPortNames().length() < 1)
-        QMessageBox::warning(this, "Error", "No COM ports available!");
-    else
-    {
-        if(rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 250) < 0)
-            QMessageBox::warning(this, "Error", "Couldn't open COM port!");
-    else
-            initialized = true;
-    }
+    ui->joystickCombo->addItems(JoystickControl::GetJoystickNames());
 
     connect(&jc, SIGNAL(axisEvent(int,int,int)), this, SLOT(joystick_axisChanged(int,int,int)));
     connect(&jc, SIGNAL(buttonEvent(int,bool)), this, SLOT(joystick_buttonPressed(int,bool)));
@@ -32,7 +21,7 @@ Widget::Widget(QWidget *parent) :
     if(JoystickControl::GetJoystickNames().length() < 1)
         QMessageBox::warning(this, "Error", "No joysticks available!");
     else
-        if(jc.Initialize(ui->comboBox_2->currentText(), 50) < 0)
+        if(jc.Initialize(ui->joystickCombo->currentText(), 50) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open joystick!");
     connect(&timer, SIGNAL(timeout()), this, SLOT(timer_tick()));
     timer.start(50);
@@ -83,23 +72,16 @@ void Widget::joystick_buttonPressed(int buttonId, bool state)
             }
             break;
         }
+        case 2:
+        {
+            rc.SetPitching(state);
+            break;
+        }
         default:
         {
             qDebug() << "ID: " << buttonId << " State: " << state;
         }
     }
-}
-
-void Widget::on_comboBox_currentIndexChanged(const QString &arg1)
-{
-    if(initialized)
-        rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
-}
-
-void Widget::on_spinBox_valueChanged(int arg1)
-{
-    if(initialized)
-        rc.Initialize(ui->comboBox->currentText(), ui->spinBox->value(), 500);
 }
 
 void Widget::on_checkBox_stateChanged(int arg1)
@@ -151,4 +133,12 @@ void Widget::on_checkBox_2_toggled(bool checked)
 void Widget::on_checkBox_3_toggled(bool checked)
 {
     rc.SetHalt(checked);
+}
+
+void Widget::on_connectBtn_clicked()
+{
+    if(rc.Initialize(ui->ipEdit->text(), ui->portSpinBox->value(), ui->enginesSpinBox->value(), 100) < 0)
+        QMessageBox::warning(this, "Error", "Couldn't open socket!");
+    else
+        initialized = true;
 }

@@ -10,9 +10,8 @@ RobotControl::RobotControl(QObject *parent) :
     vertSpeed(0),
     moveSpeed(0),
     rotateSpeed(0),
-    halt(false),
     initialized(false),
-    enginesStarted(true)
+    currentState(Stop)
 {
     lastEngine = 0;
 }
@@ -23,21 +22,11 @@ RobotControl::~RobotControl()
     socket.close();
 }
 
-int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
+int RobotControl::Initialize(QString address, int port, int _engines, int _tickTime)
 {
     engines = _engines;
     tickTime = _tickTime;
     ticksForReverse = qRound(2000.0/tickTime + 0.5); //ceil((2 seconds)/(one tick))
-
-/*    int flag = -1;
-    foreach (const SerialPortInfo &info, SerialPortInfo::availablePorts())
-        if(info.portName() == portName)
-        {
-            serial.setPort(info);
-            flag = 1;
-        }
-    if(flag < 0)
-        return flag;*/
 
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 
@@ -48,9 +37,8 @@ int RobotControl::Initialize(QString portName, int _engines, int _tickTime)
     ed.ticksSinceLastReverse.resize(engines);
     timer.start(tickTime);
 
-    //if(!serial.open(QIODevice::ReadWrite))
-    socket.connectToHost("192.168.2.2", 80);
-        //return -1;
+    socket.connectToHost(address, port);
+    currentState = Move;
     initialized = true;
     return 1;
 }
@@ -73,33 +61,45 @@ void RobotControl::SetRotateSpeed(int value)
     CalcEnginesData();
 }
 
+void RobotControl::SetPitchSpeed(int value)
+{
+    pitchSpeed = value;
+    CalcEnginesData();
+}
+
 void RobotControl::SetHalt(bool state)
 {
-    halt = state;
+    currentState = state ? Yaw : Move;
+    CalcEnginesData();
+}
+
+void RobotControl::SetPitching(bool state)
+{
+    currentState = state ? Pitch : Move;
     CalcEnginesData();
 }
 
 void RobotControl::StartEngines()
 {
-    enginesStarted = true;
+    currentState = Move;
     CalcEnginesData();
 }
 
 void RobotControl::StopEngines()
 {
-    enginesStarted = false;
+    currentState = Stop;
     CalcEnginesData();
 }
 
 void RobotControl::CalcEnginesData()
 {
     SetSpeed(vertSpeed, 0);
-    if (!enginesStarted)
+    if (currentState == Stop)
         for(int i = 0; i < engines; i++)
             SetSpeed(0, i);
     else
     {
-        if (halt)
+        if (currentState == Yaw)
         {
             SetSpeed(rotateSpeed, 1);
             SetSpeed(-rotateSpeed, 2);
@@ -165,7 +165,7 @@ void RobotControl::WriteReverse(int reverse, int engine)
 
 void RobotControl::TimerTick()
 {
-    for(int i = lastEngine; i < engines; i++)
+    for(int i = 0; i < engines; i++)
         ed.ticksSinceLastReverse[i]++;
 
     lastEngine++;
@@ -173,14 +173,14 @@ void RobotControl::TimerTick()
         if(lastEngine >= engines)
             lastEngine = 0;
 
-        if (ed.ticksSinceLastReverse[1] >= ticksForReverse)// &&
-                //ed.newReverse[lastEngine] != ed.actualReverse[lastEngine])
+        if (ed.ticksSinceLastReverse[lastEngine] >= ticksForReverse &&
+                ed.newReverse[lastEngine] != ed.actualReverse[lastEngine])
         {
-            ed.ticksSinceLastReverse[1] = 0;
+            ed.ticksSinceLastReverse[lastEngine] = 0;
             ed.actualReverse[lastEngine] = ed.newReverse[lastEngine];
             WriteReverse(ed.actualReverse[lastEngine], lastEngine);
         }else
-        //if (ed.newSpeed[lastEngine] != ed.actualSpeed[lastEngine])
+        if (ed.newSpeed[lastEngine] != ed.actualSpeed[lastEngine])
         {
             ed.actualSpeed[lastEngine] = ed.newSpeed[lastEngine];
             WriteSpeed(ed.actualSpeed[lastEngine], lastEngine);
@@ -224,11 +224,11 @@ bool RobotControl::GetReverse(int engine)
 bool RobotControl::GetHalt()
 {
     if(!initialized)return false;
-    return halt;
+    return currentState == Yaw ? true : false;
 }
 
 bool RobotControl::EnginesStarted()
 {
     if(!initialized)return false;
-    return enginesStarted;
+    return currentState != Stop ? true : false;
 }
