@@ -5,18 +5,15 @@
 
 #define DEBUG
 
-#define rs485_pin A5
-#define ENGINE_COUNT 3
-#define REVERSE_PAUSE_MSEC 1000
+#define ENGINE_COUNT 6
+#define REVERSE_PAUSE_MSEC 500
 
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 2, 2);
+IPAddress ip(192, 168, 100, 2);
 EthernetServer server(80);
 
 EthernetClient client;
-
-LSM303 compass;
 
 class Engine
 {
@@ -45,22 +42,18 @@ void SetupEngine (int engineNum, int powerPin, int reversePin)
 
 void setup()  
 { 
-  SetupEngine(0,6,7);
-  SetupEngine(1,5,4);
-  SetupEngine(2,3,2);
+  SetupEngine(0,2,14);
+  SetupEngine(1,3,15);
+  SetupEngine(2,4,16);
+  SetupEngine(3,5,17);
+  SetupEngine(4,6,18);
+  SetupEngine(5,7,19);
 
-  pinMode(rs485_pin, OUTPUT);   
-  digitalWrite(rs485_pin, LOW);
-  Serial.begin(19200); 
-  
+  Serial.begin(19200);   
   Ethernet.begin(mac, ip);
   server.begin();
   
-  Wire.begin();
-  compass.init();
-  compass.enableDefault();
-
-  Serial.print("SMTU ROV v 1.11 firmvare\n"); 
+  Serial.print("SMTU ROV v 1.2 firmvare\n"); 
 } 
 
 char buffer[20];
@@ -117,45 +110,21 @@ void ParsePowerCmd(byte engineNum)
       
     if (0 <= val && val <= 255)
     {
-	  if (ENGINES[engineNum].reverseEndTime == 0)
-		analogWrite(ENGINES[engineNum].powerPin, val);
+      if (ENGINES[engineNum].reverseEndTime == 0)
+	analogWrite(ENGINES[engineNum].powerPin, val);
       
-	  ENGINES[engineNum].currentPower = val;         
+      ENGINES[engineNum].currentPower = val;         
 
 #ifdef DEBUG
       Serial.print("Engine num: ");
       Serial.print(engineNum);    
       Serial.print(". \n");
-      Serial.print("R: ");
+      Serial.print("P: ");
       Serial.print(val);
       Serial.print('\n');
 #endif
     }
   } 
-}
-
-void SendAccelerometerData()
-{
-   compass.read();
-   
-   client.print("X ");
-   client.print((int)compass.a.x);
-   client.print(" Y: ");
-   client.print((int)compass.a.y);
-   client.print(" Z: ");
-   client.println((int)compass.a.z);   
-}
-
-void SendMagnetometerData()
-{
-   compass.read();
-   
-   client.print("X ");
-   client.print((int)compass.m.x);
-   client.print(" Y: ");
-   client.print((int)compass.m.y);
-   client.print(" Z: ");
-   client.println((int)compass.m.z);   
 }
 
 void ParseBuffer()
@@ -166,8 +135,6 @@ void ParseBuffer()
   {
     case 'r' : ParseReverseCmd(engineNum); break;
     case 'p' : ParsePowerCmd(engineNum); break; 
-    case 'a' : SendAccelerometerData(); break;
-    case 'm' : SendMagnetometerData(); break;
   }
 }
 
@@ -206,10 +173,6 @@ void ReverseCheck()
   {
     if ( ENGINES[i].reverseEndTime != 0 && currentMillis >= ENGINES[i].reverseEndTime)
     {
-        digitalWrite(rs485_pin, HIGH);
-        Serial.println(currentMillis-ENGINES[i].reverseEndTime);
-        digitalWrite(rs485_pin, LOW);
-        
 	analogWrite(ENGINES[i].powerPin, ENGINES[i].currentPower);	
 	ENGINES[i].reverseEndTime = 0;
     }		
