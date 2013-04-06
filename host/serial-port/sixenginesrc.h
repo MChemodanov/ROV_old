@@ -5,6 +5,7 @@
 
 class SixEnginesRC : public RobotControl
 {
+
 public:
     int Initialize(QString address, int port, int _engines, int _tickTime);
 

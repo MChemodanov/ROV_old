@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>368</height>
+    <width>502</width>
+    <height>387</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,8 +24,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>131</width>
-     <height>81</height>
+     <width>261</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="title">
@@ -36,7 +36,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>113</width>
+      <width>101</width>
       <height>22</height>
      </rect>
     </property>
@@ -47,8 +47,8 @@
    <widget class="QSpinBox" name="portSpinBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>50</y>
+      <x>120</x>
+      <y>20</y>
       <width>46</width>
       <height>20</height>
      </rect>
@@ -60,9 +60,9 @@
    <widget class="QPushButton" name="connectBtn">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>50</y>
-      <width>61</width>
+      <x>170</x>
+      <y>20</y>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -74,9 +74,9 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>10</y>
-     <width>112</width>
+     <x>150</x>
+     <y>60</y>
+     <width>121</width>
      <height>51</height>
     </rect>
    </property>
@@ -91,7 +91,7 @@
      <rect>
       <x>15</x>
       <y>20</y>
-      <width>81</width>
+      <width>101</width>
       <height>22</height>
      </rect>
     </property>
@@ -99,13 +99,15 @@
      <number>6</number>
     </property>
    </widget>
+   <zorder>enginesSpinBox</zorder>
+   <zorder>groupBox_3</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>10</y>
-     <width>121</width>
+     <x>10</x>
+     <y>60</y>
+     <width>131</width>
      <height>51</height>
     </rect>
    </property>
@@ -117,13 +119,13 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>101</width>
+      <width>111</width>
       <height>22</height>
      </rect>
     </property>
     <property name="maximumSize">
      <size>
-      <width>101</width>
+      <width>111</width>
       <height>16777215</height>
      </size>
     </property>
@@ -136,7 +138,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>340</y>
+     <y>360</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -146,10 +148,13 @@
    </property>
   </widget>
   <widget class="QSlider" name="verticalSlider">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>110</y>
+     <y>130</y>
      <width>19</width>
      <height>160</height>
     </rect>
@@ -165,10 +170,13 @@
    </property>
   </widget>
   <widget class="QSlider" name="verticalSlider_2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>110</y>
+     <y>130</y>
      <width>19</width>
      <height>160</height>
     </rect>
@@ -184,10 +192,13 @@
    </property>
   </widget>
   <widget class="QSlider" name="horizontalSlider">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>280</y>
+     <y>300</y>
      <width>160</width>
      <height>19</height>
     </rect>
@@ -206,7 +217,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>200</y>
      <width>41</width>
      <height>16</height>
     </rect>
@@ -219,7 +230,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>180</y>
+     <y>200</y>
      <width>53</width>
      <height>16</height>
     </rect>
@@ -232,7 +243,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>300</y>
+     <y>320</y>
      <width>53</width>
      <height>16</height>
     </rect>
@@ -241,63 +252,11 @@
     <string>Поворот</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>100</y>
-     <width>81</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Engine Data</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>120</y>
-     <width>81</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Right</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>140</y>
-     <width>81</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Left</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_7">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>160</y>
-     <width>81</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Vertical</string>
-   </property>
-  </widget>
   <widget class="QCheckBox" name="checkBox_2">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>340</y>
      <width>161</width>
      <height>20</height>
     </rect>
@@ -310,7 +269,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>360</y>
      <width>131</width>
      <height>20</height>
     </rect>
@@ -318,6 +277,17 @@
    <property name="text">
     <string>Поворот на месте</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>10</y>
+     <width>211</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout"/>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

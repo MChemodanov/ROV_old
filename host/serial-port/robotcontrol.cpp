@@ -14,11 +14,11 @@ RobotControl::RobotControl(QObject *parent) :
     currentState(Stop)
 {
     lastEngine = 0;
+    connect(&socket, SIGNAL(disconnected()), this, SLOT(SocketDisconnected()));
 }
 
 RobotControl::~RobotControl()
 {
-    //serial.close();
     socket.close();
 }
 
@@ -165,6 +165,7 @@ void RobotControl::WriteReverse(int reverse, int engine)
 
 void RobotControl::TimerTick()
 {
+
     for(int i = 0; i < engines; i++)
         ed.ticksSinceLastReverse[i]++;
 
@@ -231,4 +232,9 @@ bool RobotControl::EnginesStarted()
 {
     if(!initialized)return false;
     return currentState != Stop ? true : false;
+}
+
+void RobotControl::SocketDisconnected()
+{
+    emit Disconnected();
 }

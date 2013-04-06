@@ -6,6 +6,7 @@
 #include "serial-port/robotcontrol.h"
 #include "serial-port/sixenginesrc.h"
 #include "joystick/joystickcontrol.h"
+#include "enginesmap.h"
 
 namespace Ui {
 class Widget;
@@ -44,6 +45,8 @@ public slots:
 
     void timer_tick();
 
+    void RCDisconnected();
+
 private:
     QTimer timer;
     Ui::Widget *ui;
@@ -51,6 +54,9 @@ private:
     JoystickControl jc;
     bool joystickEnabled,
             initialized;
+    EnginesMap *em;
+
+    void LoadConfig(QString path);
 };
 
 #endif // WIDGET_H

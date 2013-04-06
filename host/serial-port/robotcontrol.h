@@ -11,7 +11,7 @@
 
 QT_USE_NAMESPACE_SERIALPORT
 
-class RobotControl : QObject
+class RobotControl : public QObject
 {
     Q_OBJECT
 
@@ -97,6 +97,11 @@ protected:
 
 private slots:
     void TimerTick();
+
+    void SocketDisconnected();
+
+signals:
+    void Disconnected();
 };
 
 #endif // ROBOTCONTROL_H

@@ -4,6 +4,8 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -12,11 +14,18 @@ Widget::Widget(QWidget *parent) :
     initialized(false)
 {
     ui->setupUi(this);
+    LoadConfig("D:/rc.cfg");
+
+    em = new EnginesMap(QImage("D:/ROV.png"));
+    em->LoadConfig("D:/em.cfg");
+    ui->gridLayout->addWidget(em,0,0);
+    ui->gridLayoutWidget->setLayout(ui->gridLayout);
 
     ui->joystickCombo->addItems(JoystickControl::GetJoystickNames());
 
     connect(&jc, SIGNAL(axisEvent(int,int,int)), this, SLOT(joystick_axisChanged(int,int,int)));
     connect(&jc, SIGNAL(buttonEvent(int,bool)), this, SLOT(joystick_buttonPressed(int,bool)));
+    connect(&rc, SIGNAL(Disconnected()), this, SLOT(RCDisconnected()));
 
     if(JoystickControl::GetJoystickNames().length() < 1)
         QMessageBox::warning(this, "Error", "No joysticks available!");
@@ -111,9 +120,12 @@ void Widget::on_verticalSlider_valueChanged(int value)
 
 void Widget::timer_tick()
 {
-    ui->label_7->setText("Vertical: " + QString(rc.GetReverse(0)?"R":"") + QString::number(rc.GetSpeed(0)));
-    ui->label_5->setText("Right: " + QString(rc.GetReverse(1)?"R":"") + QString::number(rc.GetSpeed(1)));
-    ui->label_6->setText("Left: " + QString(rc.GetReverse(2)?"R":"") + QString::number(rc.GetSpeed(2)));
+    if (initialized)
+        for (int i = 0; i < 6; i++)
+        {
+            em->SetSpeed(i, rc.GetSpeed(i)/2.55);
+            em->SetReverse(i, rc.GetReverse(i));
+        }
 }
 
 void Widget::on_comboBox_2_currentIndexChanged(const QString &arg1)
@@ -140,5 +152,37 @@ void Widget::on_connectBtn_clicked()
     if(rc.Initialize(ui->ipEdit->text(), ui->portSpinBox->value(), ui->enginesSpinBox->value(), 100) < 0)
         QMessageBox::warning(this, "Error", "Couldn't open socket!");
     else
+    {
         initialized = true;
+        ui->connectBtn->setEnabled(false);
+        ui->connectBtn->setText("Connected");
+        ui->horizontalSlider->setEnabled(true);
+        ui->verticalSlider->setEnabled(true);
+        ui->verticalSlider_2->setEnabled(true);
+    }
+}
+
+void Widget::RCDisconnected()
+{
+    QMessageBox::warning(this, "Error", "Connection lost!");
+    initialized = false;
+    ui->connectBtn->setEnabled(true);
+    ui->connectBtn->setText("Connect");
+    ui->horizontalSlider->setEnabled(false);
+    ui->verticalSlider->setEnabled(false);
+    ui->verticalSlider_2->setEnabled(false);
+}
+
+void Widget::LoadConfig(QString path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(this, "Error", "Couldn't read config file!");
+        return;
+    }
+    QTextStream in(&file);
+    ui->ipEdit->setText(in.readLine());
+    ui->portSpinBox->setValue(in.readLine().toInt());
+    file.close();
 }
