@@ -10,8 +10,8 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
 
     em.setGeometry(this->rect());
-    em.SetBackgroundImage(QImage("D:/ROV.png"));
-    em.LoadConfig("D:/em.cfg");
+    em.SetBackgroundImage(QImage("ROV.png"));
+    em.LoadConfig("em.cfg");
     em.show();
 
     server = new QTcpServer();

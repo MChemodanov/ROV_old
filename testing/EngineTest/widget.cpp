@@ -30,7 +30,7 @@ Widget::Widget(QWidget *parent) :
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(timer_ticked()));
 
-    LoadConfig("D:/rc.cfg");
+    LoadConfig("rc.cfg");
 
     ui->gridLayout = new QGridLayout(this);
 
