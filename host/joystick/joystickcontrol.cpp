@@ -12,7 +12,6 @@ JoystickControl::JoystickControl(QObject *parent) :
 
 JoystickControl::~JoystickControl()
 {
-
 }
 
 int JoystickControl::Initialize(QString joystickName, int updateTime)
@@ -28,7 +27,8 @@ int JoystickControl::Initialize(QString joystickName, int updateTime)
                 flag = 1;
             }
         buttons = SDL_JoystickNumButtons(joystick);
-        buttonStates = new bool[buttons];
+        buttonStates.clear();
+        buttonStates.resize(buttons);
         for(int i = 0; i < buttons; i++)
             buttonStates[i] = false;
     }

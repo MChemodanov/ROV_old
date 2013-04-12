@@ -54,7 +54,7 @@ private:
     JoystickControl jc;
     bool joystickEnabled,
             initialized;
-    EnginesMap *em;
+    EnginesMap em;
 
     void LoadConfig(QString path);
 };

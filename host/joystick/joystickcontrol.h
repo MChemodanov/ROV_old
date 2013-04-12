@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QVector>
 #include <SDL/SDL.h>
 
 class JoystickControl : public QObject
@@ -20,7 +21,7 @@ public:
 private:
     int buttons,
         oldX, oldY, oldZ;
-    bool *buttonStates;
+    QVector<bool> buttonStates;
     QTimer timer;
     SDL_Joystick *joystick;
 

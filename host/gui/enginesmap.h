@@ -10,7 +10,7 @@ class EnginesMap : public QWidget
 
     class Engine
     {
-        double *rect;
+        double rect[4];
 
         bool reverse;
         double speed;
@@ -20,7 +20,7 @@ class EnginesMap : public QWidget
 
         void Draw(QPainter *paint, int fieldWidth, int fieldHeight);
 
-        void SetRect(double _rect[4]);
+        void SetRect(double _rect[]);
 
         void SetSpeed(double _speed);
 
@@ -34,7 +34,7 @@ class EnginesMap : public QWidget
 public:
     explicit EnginesMap(QWidget *parent = 0);
 
-    EnginesMap(QImage backgroundImage, QWidget *parent = 0);
+    void SetBackgroundImage(QImage image);
 
     void LoadConfig(QString path);
 
@@ -43,14 +43,14 @@ public:
     void SetReverse(int engineNumber, bool reverse);
 
 private:
-    QVector<Engine*> engines;
+    QVector<Engine> engines;
     QImage _backgroundImage;
     bool imageSpecified;
 
     void paintEvent(QPaintEvent *);
-    
+
 signals:
-    
+
 public slots:
 
 };

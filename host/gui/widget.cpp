@@ -16,9 +16,9 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     LoadConfig("D:/rc.cfg");
 
-    em = new EnginesMap(QImage("D:/ROV.png"));
-    em->LoadConfig("D:/em.cfg");
-    ui->gridLayout->addWidget(em,0,0);
+    em.SetBackgroundImage(QImage("D:/ROV.png"));
+    em.LoadConfig("D:/em.cfg");
+    ui->gridLayout->addWidget(&em, 0, 0);
     ui->gridLayoutWidget->setLayout(ui->gridLayout);
 
     ui->joystickCombo->addItems(JoystickControl::GetJoystickNames());
@@ -38,6 +38,7 @@ Widget::Widget(QWidget *parent) :
 
 Widget::~Widget()
 {
+    initialized = false;
     delete ui;
 }
 
@@ -123,8 +124,8 @@ void Widget::timer_tick()
     if (initialized)
         for (int i = 0; i < 6; i++)
         {
-            em->SetSpeed(i, rc.GetSpeed(i)/2.55);
-            em->SetReverse(i, rc.GetReverse(i));
+            em.SetSpeed(i, rc.GetSpeed(i)/2.55);
+            em.SetReverse(i, rc.GetReverse(i));
         }
 }
 

@@ -10,10 +10,10 @@ int SixEnginesRC::Initialize(QString address, int port, int _engines, int _tickT
     int result = base::Initialize(address, port, _engines, _tickTime);
     ed.coeff.resize(_engines);
     ed.angle.resize(_engines);
-    ed.angle[2] = M_PI_4 * 5;
-    ed.angle[3] = M_PI_4 * 7;
-    ed.angle[4] = M_PI_4 * 3;
-    ed.angle[5] = M_PI_4;
+    ed.angle[2] = M_PI_4 * 7;
+    ed.angle[3] = M_PI_4 * 1;
+    ed.angle[4] = M_PI_4 * 5;
+    ed.angle[5] = M_PI_4 * 3;
     return result;
 }
 
@@ -29,9 +29,9 @@ void SixEnginesRC::CalcEnginesData()
         {
             SetSpeed(vertSpeed, 0);
             SetSpeed(vertSpeed, 1);
-            GetEngineCoeffs(moveSpeed, rotateSpeed);
+            GetEngineCoeffs(rotateSpeed, moveSpeed);
             for (int i = 2; i < 6; i ++)
-                SetSpeed(ed.coeff[i] * (qAbs(moveSpeed) > qAbs(rotateSpeed)? moveSpeed : rotateSpeed), i);
+                SetSpeed(ed.coeff[i] * qMax(qAbs(moveSpeed), qAbs(rotateSpeed)), i);
             break;
         }
         case Stop:
@@ -81,16 +81,18 @@ void SixEnginesRC::CalcEnginesData()
 
 void SixEnginesRC::GetEngineCoeffs(int x, int y)
 {
-    double maxCoeff = 0;
+    double maxCoeff = -1;
     for (int i = 2; i < 6; i++)
     {
-    //Angle between engine direction and movement vector direction
-    double alpha = qAbs(ed.angle[i] - qAtan(y * 1.0 / x));
+        //Angle between engine direction and movement vector direction
+        double alpha = ed.angle[i] - qAtan(y * 1.0 / x);
 
-    ed.coeff[i] = qCos(alpha);
+        ed.coeff[i] = qCos(alpha);
+        if (x < 0)
+            ed.coeff[i] *= -1;
 
-    if(qAbs(ed.coeff[i]) > maxCoeff)
-        maxCoeff = qAbs(ed.coeff[i]);
+        if(qAbs(ed.coeff[i]) > maxCoeff)
+            maxCoeff = qAbs(ed.coeff[i]);
     }
     double multiplier = 1 / maxCoeff;
     for (int i = 2; i < 6; i++)
