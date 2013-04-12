@@ -14,10 +14,10 @@ Widget::Widget(QWidget *parent) :
     initialized(false)
 {
     ui->setupUi(this);
-    LoadConfig("D:/rc.cfg");
+    LoadConfig("rc.cfg");
 
-    em.SetBackgroundImage(QImage("D:/ROV.png"));
-    em.LoadConfig("D:/em.cfg");
+    em.SetBackgroundImage(QImage("ROV.png"));
+    em.LoadConfig("em.cfg");
     ui->gridLayout->addWidget(&em, 0, 0);
     ui->gridLayoutWidget->setLayout(ui->gridLayout);
 
