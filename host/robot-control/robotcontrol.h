@@ -6,11 +6,6 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include <QtAddOnSerialPort/serialport.h>
-#include <QtAddOnSerialPort/serialportinfo.h>
-
-QT_USE_NAMESPACE_SERIALPORT
-
 class RobotControl : public QObject
 {
     Q_OBJECT
@@ -42,8 +37,6 @@ public:
 
     void StartWriting();
 
-    static QStringList GetPortNames();
-
     int GetSpeed(int engine);
 
     bool GetReverse(int engine);
@@ -53,7 +46,6 @@ public:
     bool EnginesStarted();
 
 protected:
-    //SerialPort serial;
     QTcpSocket socket;
     QTimer timer;
     int engines, tickTime,

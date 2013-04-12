@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "serial-port/robotcontrol.h"
-#include "serial-port/sixenginesrc.h"
+#include "robot-control/robotcontrol.h"
+#include "robot-control/sixenginesrc.h"
 #include "joystick/joystickcontrol.h"
 #include "enginesmap.h"
 

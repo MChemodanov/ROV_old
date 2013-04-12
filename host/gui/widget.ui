@@ -100,7 +100,6 @@
     </property>
    </widget>
    <zorder>enginesSpinBox</zorder>
-   <zorder>groupBox_3</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">

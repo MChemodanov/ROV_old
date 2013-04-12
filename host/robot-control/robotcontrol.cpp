@@ -2,9 +2,6 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include <QtAddOnSerialPort/serialport.h>
-#include <QtAddOnSerialPort/serialportinfo.h>
-
 RobotControl::RobotControl(QObject *parent) :
     QObject(parent),
     vertSpeed(0),
@@ -148,8 +145,6 @@ void RobotControl::SetReverse(int reverse, int engine)
 void RobotControl::WriteSpeed(int speed, int engine)
 {
     QString toWrite = "#p" + QString::number(engine) + QString::number(speed) + '!';
-    //if(serial.isWritable())
-      //  serial.write(toWrite.toStdString().c_str());
     if(socket.isWritable())
         socket.write(toWrite.toStdString().c_str());
 }
@@ -157,8 +152,6 @@ void RobotControl::WriteSpeed(int speed, int engine)
 void RobotControl::WriteReverse(int reverse, int engine)
 {
     QString toWrite ="#r" + QString::number(engine) + QString::number(reverse) + '!';
-    //if(serial.isWritable() && engine >= 0 && reverse >= 0 && reverse <=1)
-      //  serial.write(toWrite.toStdString().c_str());
     if(socket.isWritable())
         socket.write(toWrite.toStdString().c_str());
 }
@@ -196,14 +189,6 @@ void RobotControl::StartWriting()
 void RobotControl::StopWriting()
 {
     timer.stop();
-}
-
-QStringList RobotControl::GetPortNames()
-{
-    QStringList list;
-    foreach(const SerialPortInfo &info, SerialPortInfo::availablePorts())
-        list.insert(0, info.portName());
-    return list;
 }
 
 int RobotControl::GetSpeed(int engine)
