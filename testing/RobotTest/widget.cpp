@@ -9,10 +9,10 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    em = new EnginesMap(QImage("D:/ROV.png"));
-    em->setGeometry(this->rect());
-    em->LoadConfig("D:/em.cfg");
-    em->show();
+    em.setGeometry(this->rect());
+    em.SetBackgroundImage(QImage("D:/ROV.png"));
+    em.LoadConfig("D:/em.cfg");
+    em.show();
 
     server = new QTcpServer();
     server->connect(server, SIGNAL(newConnection()), this, SLOT(newConnectionNotify()));
@@ -92,8 +92,8 @@ void Widget::Parse(QString str)
     for (int i = 0; i < 6; i++)
     {
         result += QString("Engine #%1 speed: %2 reverse %3\n").arg(i).arg(speeds[i]).arg(reverses[i]);
-        em->SetSpeed(i, speeds[i]/2.55);
-        em->SetReverse(i, reverses[i]);
+        em.SetSpeed(i, speeds[i]/2.55);
+        em.SetReverse(i, reverses[i]);
     }
     ui->label_2->setText(result);
 }

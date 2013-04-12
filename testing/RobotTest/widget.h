@@ -22,7 +22,7 @@ public:
     
 private:
     Ui::Widget *ui;
-    EnginesMap *em;
+    EnginesMap em;
     QTcpServer *server;
     QTcpSocket *client;
     QTimer *timer;
