@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
+    <width>609</width>
     <height>387</height>
    </rect>
   </property>
@@ -99,7 +99,6 @@
      <number>6</number>
     </property>
    </widget>
-   <zorder>enginesSpinBox</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
@@ -280,13 +279,84 @@
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>390</x>
      <y>10</y>
      <width>211</width>
      <height>301</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout"/>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>279</x>
+     <y>9</y>
+     <width>101</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Manipulator</string>
+   </property>
+   <widget class="QSpinBox" name="manipSpin">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>46</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="openManipRadio">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>95</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Открыть</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="closeManipRadio">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>95</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Закрыть</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="manipBtn">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Go!</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

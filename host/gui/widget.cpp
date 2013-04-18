@@ -159,6 +159,7 @@ void Widget::on_connectBtn_clicked()
         ui->horizontalSlider->setEnabled(true);
         ui->verticalSlider->setEnabled(true);
         ui->verticalSlider_2->setEnabled(true);
+        ui->manipBtn->setEnabled(true);
     }
 }
 
@@ -171,6 +172,7 @@ void Widget::RCDisconnected()
     ui->horizontalSlider->setEnabled(false);
     ui->verticalSlider->setEnabled(false);
     ui->verticalSlider_2->setEnabled(false);
+    ui->manipBtn->setEnabled(false);
 }
 
 void Widget::LoadConfig(QString path)
@@ -185,4 +187,12 @@ void Widget::LoadConfig(QString path)
     ui->ipEdit->setText(in.readLine());
     ui->portSpinBox->setValue(in.readLine().toInt());
     file.close();
+}
+
+void Widget::on_pushButton_clicked()
+{
+    if (ui->openManipRadio->isChecked())
+        rc.OpenManip(ui->manipSpin->value());
+    else
+        rc.CloseManip(ui->manipSpin->value());
 }

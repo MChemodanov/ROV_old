@@ -45,6 +45,10 @@ public:
 
     bool EnginesStarted();
 
+    void OpenManip(int commands);
+
+    void CloseManip(int commands);
+
 protected:
     QTcpSocket socket;
     QTimer timer;

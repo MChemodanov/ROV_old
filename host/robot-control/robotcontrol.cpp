@@ -156,6 +156,24 @@ void RobotControl::WriteReverse(int reverse, int engine)
         socket.write(toWrite.toStdString().c_str());
 }
 
+void RobotControl::OpenManip(int commands)
+{
+    QString toWrite = "";
+    for (int i = 0; i < commands; i++)
+        toWrite += "#m1!";
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
+}
+
+void RobotControl::CloseManip(int commands)
+{
+    QString toWrite = "";
+    for (int i = 0; i < commands; i++)
+        toWrite += "#m0!";
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
+}
+
 void RobotControl::TimerTick()
 {
 
