@@ -44,20 +44,11 @@ void SixEnginesRC::CalcEnginesData()
         {
             SetSpeed(vertSpeed, 0);
             SetSpeed(vertSpeed, 1);
-            if(rotateSpeed >= 0)
-            {
-                SetSpeed(-rotateSpeed, 2);
-                SetSpeed(rotateSpeed, 3);
-                SetSpeed(rotateSpeed, 4);
-                SetSpeed(-rotateSpeed, 5);
-            }
-            else
-            {
-                SetSpeed(rotateSpeed, 2);
-                SetSpeed(-rotateSpeed, 3);
-                SetSpeed(-rotateSpeed, 4);
-                SetSpeed(rotateSpeed, 5);
-            }
+
+            SetSpeed(-rotateSpeed, 2);
+            SetSpeed(rotateSpeed, 3);
+            SetSpeed(rotateSpeed, 4);
+            SetSpeed(-rotateSpeed, 5);
             break;
         }
         case Pitch:
