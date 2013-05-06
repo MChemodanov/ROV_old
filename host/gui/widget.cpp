@@ -31,8 +31,9 @@ Widget::Widget(QWidget *parent) :
     else
         if(jc.Initialize(ui->joystickCombo->currentText(), 50) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open joystick!");
+
     connect(&timer, SIGNAL(timeout()), this, SLOT(timer_tick()));
-    timer.start(50);
+    timer.start(100);
 }
 
 Widget::~Widget()
@@ -121,11 +122,21 @@ void Widget::on_verticalSlider_valueChanged(int value)
 void Widget::timer_tick()
 {
     if (initialized)
+    {
         for (int i = 0; i < 6; i++)
         {
             em.SetSpeed(i, rc.GetSpeed(i)/2.55);
             em.SetReverse(i, rc.GetReverse(i));
         }
+        int depth = rc.GetDepth(), pitch = rc.GetPitch();
+        ui->label_4->setText(QString("Depth: %1\nPitch: %2").arg(QString::number(depth)).arg(QString::number(pitch)));
+
+        int hat = jc.GetHatState(0);
+        if(hat == jc.Up)
+            rc.OpenManip(1);
+        if(hat == jc.Down)
+            rc.CloseManip(1);
+    }
 }
 
 void Widget::on_comboBox_2_currentIndexChanged(const QString &arg1)
@@ -180,8 +191,13 @@ void Widget::LoadConfig(QString path)
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(this, "Error", "Couldn't read config file!");
-        return;
+        file.reset();
+        file.setFileName("D:/rc.cfg");
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            QMessageBox::warning(this, "Error", "Couldn't read config file!");
+            return;
+        }
     }
     QTextStream in(&file);
     ui->ipEdit->setText(in.readLine());

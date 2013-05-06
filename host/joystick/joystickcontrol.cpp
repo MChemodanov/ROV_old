@@ -31,6 +31,12 @@ int JoystickControl::Initialize(QString joystickName, int updateTime)
         buttonStates.resize(buttons);
         for(int i = 0; i < buttons; i++)
             buttonStates[i] = false;
+
+        hats = SDL_JoystickNumHats(joystick);
+        hatStates.clear();
+        hatStates.resize(hats);
+        for(int i = 0; i < hats; i++)
+            hatStates[i] = Middle;
     }
     return flag;
 }
@@ -64,4 +70,15 @@ void JoystickControl::TimerTick()
             buttonStates[i] = SDL_JoystickGetButton(joystick, i);
             emit buttonEvent(i, buttonStates[i]);
         }
+    for(int i = 0; i < hats; i++)
+        if(SDL_JoystickGetHat(joystick, i) != hatStates[i])
+        {
+            hatStates[i] = SDL_JoystickGetHat(joystick, i);
+            emit hatEvent(i, hatStates[i]);
+        }
+}
+
+int JoystickControl::GetHatState(int hatId)
+{
+    return hatStates[hatId];
 }

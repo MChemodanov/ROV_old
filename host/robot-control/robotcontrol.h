@@ -6,6 +6,9 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
+#include "depthcontroller.h"
+#include "diffcontroller.h"
+
 class RobotControl : public QObject
 {
     Q_OBJECT
@@ -43,6 +46,10 @@ public:
 
     bool GetHalt();
 
+    double GetDepth();
+
+    double GetPitch();
+
     bool EnginesStarted();
 
     void OpenManip(int commands);
@@ -50,6 +57,8 @@ public:
     void CloseManip(int commands);
 
 protected:
+    DiffController *diffc;
+    DepthController *depthc;
     QTcpSocket socket;
     QTimer timer;
     int engines, tickTime,

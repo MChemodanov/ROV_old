@@ -16,6 +16,8 @@ RobotControl::RobotControl(QObject *parent) :
 
 RobotControl::~RobotControl()
 {
+    delete depthc;
+    delete diffc;
     socket.close();
 }
 
@@ -35,6 +37,8 @@ int RobotControl::Initialize(QString address, int port, int _engines, int _tickT
     timer.start(tickTime);
 
     socket.connectToHost(address, port);
+    depthc = new DepthController(&socket);
+    diffc = new DiffController(&socket);
     currentState = Move;
     initialized = true;
     return 1;
@@ -229,6 +233,18 @@ bool RobotControl::GetHalt()
 {
     if(!initialized)return false;
     return currentState == Yaw ? true : false;
+}
+
+double RobotControl::GetDepth()
+{
+    if(!initialized)return 0;
+    return depthc->GetDepth();
+}
+
+double RobotControl::GetPitch()
+{
+    if(!initialized)return 0;
+    return diffc->GetPitch();
 }
 
 bool RobotControl::EnginesStarted()

@@ -20,6 +20,8 @@ SOURCES += *.cpp \
 HEADERS += *.h \
     ../robot-control/robotcontrol.h \
     ../robot-control/sixenginesrc.h \
-    ../joystick/joystickcontrol.h
+    ../joystick/joystickcontrol.h \
+    diffcontroller.h \
+    depthcontroller.h
 
 FORMS += widget.ui
