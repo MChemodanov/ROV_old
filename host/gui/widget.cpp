@@ -1,6 +1,5 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "serial-port/robotcontrol.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -14,11 +13,11 @@ Widget::Widget(QWidget *parent) :
     initialized(false)
 {
     ui->setupUi(this);
-    LoadConfig("D:/rc.cfg");
+    LoadConfig("rc.cfg");
 
-    em = new EnginesMap(QImage("D:/ROV.png"));
-    em->LoadConfig("D:/em.cfg");
-    ui->gridLayout->addWidget(em,0,0);
+    em.SetBackgroundImage(QImage("ROV.png"));
+    em.LoadConfig("em.cfg");
+    ui->gridLayout->addWidget(&em, 0, 0);
     ui->gridLayoutWidget->setLayout(ui->gridLayout);
 
     ui->joystickCombo->addItems(JoystickControl::GetJoystickNames());
@@ -32,12 +31,14 @@ Widget::Widget(QWidget *parent) :
     else
         if(jc.Initialize(ui->joystickCombo->currentText(), 50) < 0)
             QMessageBox::warning(this, "Error", "Couldn't open joystick!");
+
     connect(&timer, SIGNAL(timeout()), this, SLOT(timer_tick()));
-    timer.start(50);
+    timer.start(100);
 }
 
 Widget::~Widget()
 {
+    initialized = false;
     delete ui;
 }
 
@@ -121,11 +122,21 @@ void Widget::on_verticalSlider_valueChanged(int value)
 void Widget::timer_tick()
 {
     if (initialized)
+    {
         for (int i = 0; i < 6; i++)
         {
-            em->SetSpeed(i, rc.GetSpeed(i)/2.55);
-            em->SetReverse(i, rc.GetReverse(i));
+            em.SetSpeed(i, rc.GetSpeed(i)/2.55);
+            em.SetReverse(i, rc.GetReverse(i));
         }
+        int depth = rc.GetDepth(), pitch = rc.GetPitch();
+        ui->label_4->setText(QString("Depth: %1\nPitch: %2").arg(QString::number(depth)).arg(QString::number(pitch)));
+
+        int hat = jc.GetHatState(0);
+        if(hat == jc.Up)
+            rc.OpenManip(1);
+        if(hat == jc.Down)
+            rc.CloseManip(1);
+    }
 }
 
 void Widget::on_comboBox_2_currentIndexChanged(const QString &arg1)
@@ -159,6 +170,7 @@ void Widget::on_connectBtn_clicked()
         ui->horizontalSlider->setEnabled(true);
         ui->verticalSlider->setEnabled(true);
         ui->verticalSlider_2->setEnabled(true);
+        ui->manipBtn->setEnabled(true);
     }
 }
 
@@ -171,6 +183,7 @@ void Widget::RCDisconnected()
     ui->horizontalSlider->setEnabled(false);
     ui->verticalSlider->setEnabled(false);
     ui->verticalSlider_2->setEnabled(false);
+    ui->manipBtn->setEnabled(false);
 }
 
 void Widget::LoadConfig(QString path)
@@ -178,11 +191,24 @@ void Widget::LoadConfig(QString path)
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(this, "Error", "Couldn't read config file!");
-        return;
+        file.reset();
+        file.setFileName("D:/rc.cfg");
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            QMessageBox::warning(this, "Error", "Couldn't read config file!");
+            return;
+        }
     }
     QTextStream in(&file);
     ui->ipEdit->setText(in.readLine());
     ui->portSpinBox->setValue(in.readLine().toInt());
     file.close();
+}
+
+void Widget::on_pushButton_clicked()
+{
+    if (ui->openManipRadio->isChecked())
+        rc.OpenManip(ui->manipSpin->value());
+    else
+        rc.CloseManip(ui->manipSpin->value());
 }

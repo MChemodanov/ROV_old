@@ -13,14 +13,15 @@ LIBS += -lSDL
 #LIBS += libSerialPort
 
 SOURCES += *.cpp \
-    ../serial-port/robotcontrol.cpp \
-    ../serial-port/sixenginesrc.cpp \
+    ../robot-control/robotcontrol.cpp \
+    ../robot-control/sixenginesrc.cpp \
     ../joystick/joystickcontrol.cpp
 
 HEADERS += *.h \
-    ../serial-port/robotcontrol.h \
-    ../serial-port/sixenginesrc.h \
+    ../robot-control/robotcontrol.h \
+    ../robot-control/sixenginesrc.h \
     ../joystick/joystickcontrol.h \
-    enginesmap.h
+    diffcontroller.h \
+    depthcontroller.h
 
 FORMS += widget.ui

@@ -2,9 +2,6 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include <QtAddOnSerialPort/serialport.h>
-#include <QtAddOnSerialPort/serialportinfo.h>
-
 RobotControl::RobotControl(QObject *parent) :
     QObject(parent),
     vertSpeed(0),
@@ -19,6 +16,8 @@ RobotControl::RobotControl(QObject *parent) :
 
 RobotControl::~RobotControl()
 {
+    delete depthc;
+    delete diffc;
     socket.close();
 }
 
@@ -38,6 +37,8 @@ int RobotControl::Initialize(QString address, int port, int _engines, int _tickT
     timer.start(tickTime);
 
     socket.connectToHost(address, port);
+    depthc = new DepthController(&socket);
+    diffc = new DiffController(&socket);
     currentState = Move;
     initialized = true;
     return 1;
@@ -148,8 +149,6 @@ void RobotControl::SetReverse(int reverse, int engine)
 void RobotControl::WriteSpeed(int speed, int engine)
 {
     QString toWrite = "#p" + QString::number(engine) + QString::number(speed) + '!';
-    //if(serial.isWritable())
-      //  serial.write(toWrite.toStdString().c_str());
     if(socket.isWritable())
         socket.write(toWrite.toStdString().c_str());
 }
@@ -157,8 +156,24 @@ void RobotControl::WriteSpeed(int speed, int engine)
 void RobotControl::WriteReverse(int reverse, int engine)
 {
     QString toWrite ="#r" + QString::number(engine) + QString::number(reverse) + '!';
-    //if(serial.isWritable() && engine >= 0 && reverse >= 0 && reverse <=1)
-      //  serial.write(toWrite.toStdString().c_str());
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
+}
+
+void RobotControl::OpenManip(int commands)
+{
+    QString toWrite = "";
+    for (int i = 0; i < commands; i++)
+        toWrite += "#m1!";
+    if(socket.isWritable())
+        socket.write(toWrite.toStdString().c_str());
+}
+
+void RobotControl::CloseManip(int commands)
+{
+    QString toWrite = "";
+    for (int i = 0; i < commands; i++)
+        toWrite += "#m0!";
     if(socket.isWritable())
         socket.write(toWrite.toStdString().c_str());
 }
@@ -198,14 +213,6 @@ void RobotControl::StopWriting()
     timer.stop();
 }
 
-QStringList RobotControl::GetPortNames()
-{
-    QStringList list;
-    foreach(const SerialPortInfo &info, SerialPortInfo::availablePorts())
-        list.insert(0, info.portName());
-    return list;
-}
-
 int RobotControl::GetSpeed(int engine)
 {
     if(!initialized)return 0;
@@ -226,6 +233,18 @@ bool RobotControl::GetHalt()
 {
     if(!initialized)return false;
     return currentState == Yaw ? true : false;
+}
+
+double RobotControl::GetDepth()
+{
+    if(!initialized)return 0;
+    return depthc->GetDepth();
+}
+
+double RobotControl::GetPitch()
+{
+    if(!initialized)return 0;
+    return diffc->GetPitch();
 }
 
 bool RobotControl::EnginesStarted()

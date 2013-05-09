@@ -6,10 +6,8 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include <QtAddOnSerialPort/serialport.h>
-#include <QtAddOnSerialPort/serialportinfo.h>
-
-QT_USE_NAMESPACE_SERIALPORT
+#include "depthcontroller.h"
+#include "diffcontroller.h"
 
 class RobotControl : public QObject
 {
@@ -42,18 +40,25 @@ public:
 
     void StartWriting();
 
-    static QStringList GetPortNames();
-
     int GetSpeed(int engine);
 
     bool GetReverse(int engine);
 
     bool GetHalt();
 
+    double GetDepth();
+
+    double GetPitch();
+
     bool EnginesStarted();
 
+    void OpenManip(int commands);
+
+    void CloseManip(int commands);
+
 protected:
-    //SerialPort serial;
+    DiffController *diffc;
+    DepthController *depthc;
     QTcpSocket socket;
     QTimer timer;
     int engines, tickTime,

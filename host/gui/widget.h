@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "serial-port/robotcontrol.h"
-#include "serial-port/sixenginesrc.h"
+#include "robot-control/robotcontrol.h"
+#include "robot-control/sixenginesrc.h"
 #include "joystick/joystickcontrol.h"
 #include "enginesmap.h"
 
@@ -38,6 +38,8 @@ private slots:
 
     void on_connectBtn_clicked();
 
+    void on_pushButton_clicked();
+
 public slots:
     void joystick_axisChanged(int arg1, int arg2, int arg3);
 
@@ -54,7 +56,7 @@ private:
     JoystickControl jc;
     bool joystickEnabled,
             initialized;
-    EnginesMap *em;
+    EnginesMap em;
 
     void LoadConfig(QString path);
 };

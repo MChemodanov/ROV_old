@@ -13,33 +13,28 @@ EnginesMap::EnginesMap(QWidget *parent) :
 {
 }
 
-EnginesMap::EnginesMap(QImage backgroundImage, QWidget *parent) :
-    QWidget(parent),
-    imageSpecified(false)
-{
-    _backgroundImage = backgroundImage;
-    imageSpecified = true;
-}
-
 void EnginesMap::LoadConfig(QString path)
 {
     QFile configFile(path);
     if (!configFile.open(QIODevice::ReadOnly))
-        return;
+    {
+        configFile.setFileName("D:/em.cfg");
+        if (!configFile.open(QIODevice::ReadOnly))
+            return;
+    }
     engines.clear();
     bool readingEngine = false;
     QTextStream in(&configFile);
     QString line;
-    Engine* newEngine;
     while(!in.atEnd())
     {
+        Engine newEngine;
         line = in.readLine();
         if(!readingEngine)
         {
             if(line.contains("Engine"))
             {
                 readingEngine = true;
-                newEngine = new Engine();
             }
         }
         else
@@ -47,8 +42,8 @@ void EnginesMap::LoadConfig(QString path)
             if(line.contains("End"))
             {
                 readingEngine = false;
-                newEngine->SetSpeed(0);
-                newEngine->SetReverse(0);
+                newEngine.SetSpeed(0);
+                newEngine.SetReverse(0);
                 engines.push_back(newEngine);
             }
             else
@@ -56,18 +51,24 @@ void EnginesMap::LoadConfig(QString path)
                 QString parameter = line.split('=')[0];
                 QString value = line.split('=')[1];
                 if (parameter.contains("number"))
-                    newEngine->SetNumber(value.toInt());
+                    newEngine.SetNumber(value.toInt());
                 if (parameter.contains("rect"))
                 {
                     QStringList list = value.split(',');
-                    double *rect = new double[4];
+                    double rect[4];
                     for(int i = 0; i < 4; i++)
                         rect[i] = list[i].toDouble();
-                    newEngine->SetRect(rect);
+                    newEngine.SetRect(rect);
                 }
             }
         }
     }
+}
+
+void EnginesMap::SetBackgroundImage(QImage image)
+{
+    _backgroundImage = image;
+    imageSpecified = true;
 }
 
 void EnginesMap::paintEvent(QPaintEvent *)
@@ -77,23 +78,23 @@ void EnginesMap::paintEvent(QPaintEvent *)
     paint.fillRect(0, 0, this->width(), this->height(), Qt::gray);
     if(imageSpecified)
         paint.drawImage(QRect(0,0,this->width(),this->height()), _backgroundImage);
-    foreach(Engine* eng, engines)
-        eng->Draw(&paint, this->width(), this->height());
+    foreach(Engine eng, engines)
+        eng.Draw(&paint, this->width(), this->height());
 }
 
 void EnginesMap::SetSpeed(int engineNumber, int speed)
 {
     for (int i = 0; i < engines.count(); i++)
-        if (engines[i]->GetNumber() == engineNumber)
-            engines[i]->SetSpeed(speed);
+        if (engines[i].GetNumber() == engineNumber)
+            engines[i].SetSpeed(speed);
     this->repaint();
 }
 
 void EnginesMap::SetReverse(int engineNumber, bool reverse)
 {
     for (int i = 0; i < engines.count(); i++)
-        if (engines[i]->GetNumber() == engineNumber)
-            engines[i]->SetReverse(reverse);
+        if (engines[i].GetNumber() == engineNumber)
+            engines[i].SetReverse(reverse);
     this->repaint();
 }
 
@@ -143,9 +144,10 @@ void EnginesMap::Engine::Draw(QPainter *paint, int fieldWidth, int fieldHeight)
     paint->setPen(prevPen);
 }
 
-void EnginesMap::Engine::SetRect(double *_rect)
+void EnginesMap::Engine::SetRect(double _rect[])
 {
-    rect = _rect;
+    for (int i = 0; i < 4; i++)
+        rect[i] = _rect[i];
 }
 
 void EnginesMap::Engine::SetSpeed(double _speed)
