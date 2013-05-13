@@ -16,10 +16,12 @@ public:
 
     int GetVertSpeed();
 
+    void SetTargetDepth(double tgDepth);
+
 private:
     QTcpSocket *_socket;
     QTimer timer;
-    double depth;
+    double depth, targetDepth;
     int vertSpeed;
 
     void QueryDepth();

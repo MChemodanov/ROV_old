@@ -14,6 +14,7 @@ DiffController::DiffController(QTcpSocket *socket, QObject *parent) :
 void DiffController::timerTick()
 {
     QueryPitch();
+    CalcSpeeds();
 }
 
 void DiffController::QueryPitch()
@@ -27,7 +28,30 @@ void DiffController::QueryPitch()
     //else emit error
     if(string != "" && string.startsWith("$qp") && string.endsWith("!"))
         pitch = string.mid(3, string.length() - 4).toDouble();
-    //CalcSpeeds();
+}
+
+void DiffController::CalcSpeeds()
+{
+    fwSpeed = bwSpeed = 1;
+    double difference = qAbs(targetPitch - pitch);
+    if(difference > 5)
+    {
+        if(targetPitch < pitch)
+        {
+            bwSpeed = difference / 90;
+            fwSpeed = 2 - bwSpeed;
+        }
+        else
+        {
+            fwSpeed = difference / 90;
+            bwSpeed = 2 - fwSpeed;
+        }
+    }
+}
+
+void DiffController::SetTargetPitch(double tgPitch)
+{
+    targetPitch = tgPitch;
 }
 
 double DiffController::GetPitch()

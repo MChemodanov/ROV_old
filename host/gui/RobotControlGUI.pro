@@ -22,6 +22,7 @@ HEADERS += *.h \
     ../robot-control/sixenginesrc.h \
     ../joystick/joystickcontrol.h \
     diffcontroller.h \
-    depthcontroller.h
+    depthcontroller.h \
+    verticalcontroller.h
 
 FORMS += widget.ui

@@ -8,6 +8,7 @@ RobotControl::RobotControl(QObject *parent) :
     moveSpeed(0),
     rotateSpeed(0),
     initialized(false),
+    manualControl(false),
     currentState(Stop)
 {
     lastEngine = 0;
@@ -16,8 +17,6 @@ RobotControl::RobotControl(QObject *parent) :
 
 RobotControl::~RobotControl()
 {
-    delete depthc;
-    delete diffc;
     socket.close();
 }
 
@@ -37,8 +36,7 @@ int RobotControl::Initialize(QString address, int port, int _engines, int _tickT
     timer.start(tickTime);
 
     socket.connectToHost(address, port);
-    depthc = new DepthController(&socket);
-    diffc = new DiffController(&socket);
+    vertc.reset(new VerticalController(&socket));
     currentState = Move;
     initialized = true;
     return 1;
@@ -94,7 +92,11 @@ void RobotControl::StopEngines()
 
 void RobotControl::CalcEnginesData()
 {
-    SetSpeed(vertSpeed, 0);
+    if(manualControl)
+        SetSpeed(vertSpeed, 0);
+    else
+        SetSpeed(vertc->GetForwardSpeed(), 0);
+
     if (currentState == Stop)
         for(int i = 0; i < engines; i++)
             SetSpeed(0, i);
@@ -180,6 +182,7 @@ void RobotControl::CloseManip(int commands)
 
 void RobotControl::TimerTick()
 {
+    CalcEnginesData();
 
     for(int i = 0; i < engines; i++)
         ed.ticksSinceLastReverse[i]++;
@@ -238,13 +241,13 @@ bool RobotControl::GetHalt()
 double RobotControl::GetDepth()
 {
     if(!initialized)return 0;
-    return depthc->GetDepth();
+    return vertc->GetDepth();
 }
 
 double RobotControl::GetPitch()
 {
     if(!initialized)return 0;
-    return diffc->GetPitch();
+    return vertc->GetPitch();
 }
 
 bool RobotControl::EnginesStarted()
@@ -256,4 +259,21 @@ bool RobotControl::EnginesStarted()
 void RobotControl::SocketDisconnected()
 {
     emit Disconnected();
+}
+
+void RobotControl::SetTargetDepth(double tgDepth)
+{
+    if(initialized)
+        vertc->SetTargetDepth(tgDepth);
+}
+
+void RobotControl::SetTargetPitch(double tgPitch)
+{
+    if(initialized)
+        vertc->SetTargetPitch(tgPitch);
+}
+
+void RobotControl::SetManualControl(bool state)
+{
+    manualControl = state;
 }

@@ -5,7 +5,9 @@
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget),
+    depth(0),
+    pitch(0)
 {
     ui->setupUi(this);
 
@@ -33,6 +35,9 @@ Widget::Widget(QWidget *parent) :
         reverses[i] = false;
         speeds[i] = 0;
     }
+
+    connect(&timer, SIGNAL(timeout()), this, SLOT(CalcData()));
+    timer.start(1000);
 }
 
 Widget::~Widget()
@@ -43,8 +48,6 @@ Widget::~Widget()
 
 void Widget::newConnectionNotify()
 {
-    //QMessageBox::warning(this, "Hooray!", "New Connection");
-    //timer->start(1000);
     client = server->nextPendingConnection();
 
     connect(client, SIGNAL(readyRead()), this, SLOT(refresh()));
@@ -76,6 +79,11 @@ void Widget::Parse(QString str)
     QStringList list = str.split('!');
     foreach(QString element, list)
     {
+        if (element == "#qp")
+            client->write(QString("$qp%1!").arg(pitch).toStdString().c_str());
+        if (element == "#qd")
+            client->write(QString("$qd%1!").arg(depth).toStdString().c_str());
+
         int i = 0;
         if (element[0] != '#')
             continue;
@@ -95,5 +103,22 @@ void Widget::Parse(QString str)
         em.SetSpeed(i, speeds[i]/2.55);
         em.SetReverse(i, reverses[i]);
     }
+    result += QString("Depth: %1\nPitch: %2").arg(depth).arg(pitch);
     ui->label_2->setText(result);
+}
+
+void Widget::CalcData()
+{
+    depth += ((reverses[0]?1:-1) * speeds[0] + (reverses[1]?1:-1) * speeds[1]) / 1000;
+    pitch += ((reverses[0]?-1:1) * speeds[0] - (reverses[1]?-1:1) * speeds[1]) / 100;
+}
+
+void Widget::on_pushButton_clicked()
+{
+    depth = ui->doubleSpinBox->value();
+}
+
+void Widget::on_pushButton_2_clicked()
+{
+    pitch = ui->doubleSpinBox_2->value();
 }

@@ -6,8 +6,9 @@
 #include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include "depthcontroller.h"
-#include "diffcontroller.h"
+#include "auto_ptr.h"
+
+#include "verticalcontroller.h"
 
 class RobotControl : public QObject
 {
@@ -50,6 +51,12 @@ public:
 
     double GetPitch();
 
+    void SetTargetDepth(double tgDepth);
+
+    void SetTargetPitch(double tgPitch);
+
+    void SetManualControl(bool state);
+
     bool EnginesStarted();
 
     void OpenManip(int commands);
@@ -57,8 +64,7 @@ public:
     void CloseManip(int commands);
 
 protected:
-    DiffController *diffc;
-    DepthController *depthc;
+    std::auto_ptr<VerticalController> vertc;
     QTcpSocket socket;
     QTimer timer;
     int engines, tickTime,
@@ -68,7 +74,7 @@ protected:
         moveSpeed,
         rotateSpeed,
         pitchSpeed;
-    bool initialized;
+    bool initialized, manualControl;
 
     struct EngineData
     {

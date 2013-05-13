@@ -17,11 +17,7 @@ void EnginesMap::LoadConfig(QString path)
 {
     QFile configFile(path);
     if (!configFile.open(QIODevice::ReadOnly))
-    {
-        configFile.setFileName("D:/em.cfg");
-        if (!configFile.open(QIODevice::ReadOnly))
-            return;
-    }
+        return;
     engines.clear();
     bool readingEngine = false;
     QTextStream in(&configFile);

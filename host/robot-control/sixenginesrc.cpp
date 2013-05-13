@@ -27,8 +27,16 @@ void SixEnginesRC::CalcEnginesData()
     {
         case Move:
         {
-            SetSpeed(vertSpeed, 0);
-            SetSpeed(vertSpeed, 1);
+            if (manualControl)
+            {
+                SetSpeed(vertSpeed, 0);
+                SetSpeed(vertSpeed, 1);
+            }
+            else
+            {
+                SetSpeed(vertc->GetForwardSpeed(), 0);
+                SetSpeed(vertc->GetBackwardSpeed(), 1);
+            }
             GetEngineCoeffs(rotateSpeed, moveSpeed);
             for (int i = 2; i < 6; i ++)
                 SetSpeed(ed.coeff[i] * qMax(qAbs(moveSpeed), qAbs(rotateSpeed)), i);

@@ -40,6 +40,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_checkBox_4_stateChanged(int arg1);
+
 public slots:
     void joystick_axisChanged(int arg1, int arg2, int arg3);
 

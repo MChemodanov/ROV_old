@@ -18,10 +18,12 @@ public:
 
     int GetBackwardSpeed();
 
+    void SetTargetPitch(double tgPitch);
+
 private:
     QTcpSocket *_socket;
     QTimer timer;
-    double pitch;
+    double pitch, targetPitch;
     int fwSpeed, bwSpeed;
 
     void QueryPitch();

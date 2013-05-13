@@ -117,6 +117,7 @@ void Widget::on_horizontalSlider_valueChanged(int value)
 void Widget::on_verticalSlider_valueChanged(int value)
 {
     rc.SetVerticalSpeed(value);
+    rc.SetTargetDepth(int(value / 25.5));
 }
 
 void Widget::timer_tick()
@@ -191,13 +192,8 @@ void Widget::LoadConfig(QString path)
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
     {
-        file.reset();
-        file.setFileName("D:/rc.cfg");
-        if (!file.open(QIODevice::ReadOnly))
-        {
-            QMessageBox::warning(this, "Error", "Couldn't read config file!");
-            return;
-        }
+        QMessageBox::warning(this, "Error", "Couldn't read config file!");
+        return;
     }
     QTextStream in(&file);
     ui->ipEdit->setText(in.readLine());
@@ -211,4 +207,10 @@ void Widget::on_pushButton_clicked()
         rc.OpenManip(ui->manipSpin->value());
     else
         rc.CloseManip(ui->manipSpin->value());
+}
+
+void Widget::on_checkBox_4_stateChanged(int arg1)
+{
+    if(initialized)
+        rc.SetManualControl(! bool(arg1));
 }

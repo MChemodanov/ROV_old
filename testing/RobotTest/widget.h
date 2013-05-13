@@ -25,16 +25,21 @@ private:
     EnginesMap em;
     QTcpServer *server;
     QTcpSocket *client;
-    QTimer *timer;
+    QTimer timer;
     bool *reverses;
     double *speeds;
+    double depth, pitch;
 
     void Parse(QString str);
 
 private slots:
+    void CalcData();
+
     void newConnectionNotify();
 
     void refresh();
+    void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
 };
 
 #endif // WIDGET_H
