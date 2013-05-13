@@ -383,6 +383,9 @@
    <property name="text">
     <string>Авто-регулировка</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
