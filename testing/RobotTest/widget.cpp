@@ -14,7 +14,8 @@ Widget::Widget(QWidget *parent) :
     em.setGeometry(this->rect());
     em.SetBackgroundImage(QImage("ROV.png"));
     em.LoadConfig("em.cfg");
-    em.show();
+    ui->gridLayout->addWidget(&em, 0, 0);
+    ui->gridLayoutWidget->setLayout(ui->gridLayout);
 
     server = new QTcpServer();
     server->connect(server, SIGNAL(newConnection()), this, SLOT(newConnectionNotify()));

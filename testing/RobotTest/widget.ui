@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>530</width>
+    <height>340</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>20</x>
      <y>50</y>
-     <width>331</width>
-     <height>81</height>
+     <width>201</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="text">
@@ -31,8 +31,8 @@
     <rect>
      <x>30</x>
      <y>130</y>
-     <width>321</width>
-     <height>131</height>
+     <width>221</width>
+     <height>181</height>
     </rect>
    </property>
    <property name="text">
@@ -52,8 +52,8 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>10</y>
+     <x>10</x>
+     <y>30</y>
      <width>62</width>
      <height>22</height>
     </rect>
@@ -64,7 +64,7 @@
     <rect>
      <x>80</x>
      <y>10</y>
-     <width>101</width>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -75,8 +75,8 @@
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>10</y>
+     <x>80</x>
+     <y>30</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -84,6 +84,17 @@
    <property name="text">
     <string>Задать дифферент</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>241</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout"/>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
