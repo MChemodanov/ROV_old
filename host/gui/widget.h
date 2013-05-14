@@ -38,7 +38,7 @@ private slots:
 
     void on_connectBtn_clicked();
 
-    void on_pushButton_clicked();
+    void on_manipBtn_clicked();
 
     void on_autoPitchCheck_stateChanged(int arg1);
 

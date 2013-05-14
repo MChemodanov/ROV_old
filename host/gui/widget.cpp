@@ -207,7 +207,7 @@ void Widget::LoadConfig(QString path)
     file.close();
 }
 
-void Widget::on_pushButton_clicked()
+void Widget::on_manipBtn_clicked()
 {
     if (ui->openManipRadio->isChecked())
         rc.OpenManip(ui->manipSpin->value());
