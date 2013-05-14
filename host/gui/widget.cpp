@@ -119,11 +119,11 @@ void Widget::on_horizontalSlider_valueChanged(int value)
 void Widget::on_verticalSlider_valueChanged(int value)
 {
     rc.SetVerticalSpeed(value);
-    double depth = int(value / 25.5) + 10;
+    double depth = value / 102.0 + 2.5;
     rc.SetTargetDepth(depth);
-    ui->heightLabel->setText("Высота");
+    ui->heightLabel->setText(tr("Высота"));
     if(ui->autoHeightCheck->isChecked())
-        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(depth));
+        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(QString::number(depth, 'g', 2)));
 }
 
 void Widget::timer_tick()
@@ -219,21 +219,21 @@ void Widget::on_autoPitchCheck_stateChanged(int arg1)
 {
     if(initialized)
     {
-        rc.SetDepthReg(bool(arg1));
+        rc.SetPitchReg(bool(arg1));
     }
 }
 
 void Widget::on_autoHeightCheck_stateChanged(int arg1)
 {
     int value = ui->verticalSlider->value();
-    double depth = int(value / 25.5) + 10;
+    double depth = value / 102.0 + 2.5;
     if(initialized)
     {
         rc.SetManualControl(! bool(arg1));
         rc.SetTargetDepth(depth);
         rc.SetDepthReg(bool(arg1));
     }
-    ui->heightLabel->setText("Высота");
+    ui->heightLabel->setText(tr("Высота"));
     if(ui->autoHeightCheck->isChecked())
-        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(depth));
+        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(QString::number(depth, 'g', 2)));
 }

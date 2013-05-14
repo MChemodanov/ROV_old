@@ -37,7 +37,7 @@ void DiffController::CalcSpeeds()
     double difference = qAbs(targetPitch - pitch);
     if(difference > 5)
     {
-        if(targetPitch < pitch)
+        if(targetPitch > pitch)
         {
             bwSpeed = difference / 90;
             fwSpeed = 2 - bwSpeed;
