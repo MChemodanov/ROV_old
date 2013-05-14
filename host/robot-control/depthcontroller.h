@@ -13,7 +13,7 @@ public:
 
     double GetDepth();
 
-    int GetVertSpeed();
+    double GetVertSpeed();
 
     void SetTargetDepth(double tgDepth);
 
@@ -22,7 +22,7 @@ public:
 private:
     QTcpSocket *_socket;
     double depth, targetDepth;
-    int vertSpeed;
+    double vertSpeed;
 
     void CalcSpeed();
     

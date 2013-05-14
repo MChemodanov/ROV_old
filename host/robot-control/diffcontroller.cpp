@@ -37,15 +37,17 @@ void DiffController::CalcSpeeds()
     double difference = qAbs(targetPitch - pitch);
     if(difference > 5)
     {
+        double proportion = difference / 30;
         if(targetPitch > pitch)
         {
-            bwSpeed = difference / 90;
-            fwSpeed = 2 - bwSpeed;
+
+            bwSpeed = 1 + proportion;
+            fwSpeed = 1 - proportion;
         }
         else
         {
-            fwSpeed = difference / 90;
-            bwSpeed = 2 - fwSpeed;
+            fwSpeed = 1 + proportion;
+            bwSpeed = 1 - proportion;
         }
     }
 }
@@ -60,12 +62,12 @@ double DiffController::GetPitch()
     return pitch;
 }
 
-int DiffController::GetBackwardSpeed()
+double DiffController::GetBackwardSpeed()
 {
     return bwSpeed;
 }
 
-int DiffController::GetForwardSpeed()
+double DiffController::GetForwardSpeed()
 {
     return fwSpeed;
 }

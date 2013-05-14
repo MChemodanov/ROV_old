@@ -56,7 +56,7 @@ double DepthController::GetDepth()
     return depth;
 }
 
-int DepthController::GetVertSpeed()
+double DepthController::GetVertSpeed()
 {
     return vertSpeed;
 }

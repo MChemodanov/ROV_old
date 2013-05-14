@@ -13,9 +13,9 @@ public:
 
     double GetPitch();
 
-    int GetForwardSpeed();
+    double GetForwardSpeed();
 
-    int GetBackwardSpeed();
+    double GetBackwardSpeed();
 
     void SetTargetPitch(double tgPitch);
 
@@ -24,7 +24,7 @@ public:
 private:
     QTcpSocket *_socket;
     double pitch, targetPitch;
-    int fwSpeed, bwSpeed;
+    double fwSpeed, bwSpeed;
 
     void CalcSpeeds();
     
