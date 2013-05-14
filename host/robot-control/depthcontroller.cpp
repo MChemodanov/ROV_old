@@ -2,20 +2,11 @@
 #include <QDebug>
 
 DepthController::DepthController(QTcpSocket *socket, QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    targetDepth(0)
 {
     if(socket->isOpen())
-    {
         _socket = socket;
-        connect(&timer, SIGNAL(timeout()), this, SLOT(timerTick()));
-        timer.start(1000);
-    }
-}
-
-void DepthController::timerTick()
-{
-    QueryDepth();
-    CalcSpeed();
 }
 
 void DepthController::QueryDepth()
@@ -27,8 +18,17 @@ void DepthController::QueryDepth()
     if(_socket->waitForReadyRead(2000))
         string = _socket->readLine();
     //else emit error
-    if(string != "" && string.startsWith("$qd") && string.endsWith("!"))
-        depth = string.mid(3, string.length() - 4).toDouble();
+    int begin = string.indexOf("$qd");
+    if (begin == -1)
+        return;
+    begin += 3;
+    int end = string.indexOf("!",begin);
+
+    if (end == -1)
+        return;
+    depth = string.mid(begin, end-begin).toDouble();
+
+    CalcSpeed();
 }
 
 void DepthController::CalcSpeed()

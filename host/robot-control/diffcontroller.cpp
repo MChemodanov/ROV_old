@@ -1,20 +1,11 @@
 #include "diffcontroller.h"
 
 DiffController::DiffController(QTcpSocket *socket, QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    targetPitch(0)
 {
     if(socket->isOpen())
-    {
         _socket = socket;
-        connect(&timer, SIGNAL(timeout()), this, SLOT(timerTick()));
-        timer.start(1000);
-    }
-}
-
-void DiffController::timerTick()
-{
-    QueryPitch();
-    CalcSpeeds();
 }
 
 void DiffController::QueryPitch()
@@ -36,6 +27,8 @@ void DiffController::QueryPitch()
         return;
 
     pitch = string.mid(begin, end-begin).toDouble();
+
+    CalcSpeeds();
 }
 
 void DiffController::CalcSpeeds()

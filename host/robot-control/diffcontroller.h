@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QString>
-#include <QTimer>
 
 class DiffController : public QObject
 {
@@ -20,18 +19,14 @@ public:
 
     void SetTargetPitch(double tgPitch);
 
+    void QueryPitch();
+
 private:
     QTcpSocket *_socket;
-    QTimer timer;
     double pitch, targetPitch;
     int fwSpeed, bwSpeed;
 
-    void QueryPitch();
-
     void CalcSpeeds();
-
-private slots:
-    void timerTick();
     
 signals:
     

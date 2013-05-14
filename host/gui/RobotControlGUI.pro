@@ -15,14 +15,17 @@ LIBS += -lSDL
 SOURCES += *.cpp \
     ../robot-control/robotcontrol.cpp \
     ../robot-control/sixenginesrc.cpp \
+    ../robot-control/diffcontroller.cpp \
+    ../robot-control/depthcontroller.cpp \
+    ../robot-control/verticalcontroller.cpp \
     ../joystick/joystickcontrol.cpp
 
 HEADERS += *.h \
+    ../joystick/joystickcontrol.h \
     ../robot-control/robotcontrol.h \
     ../robot-control/sixenginesrc.h \
-    ../joystick/joystickcontrol.h \
-    diffcontroller.h \
-    depthcontroller.h \
-    verticalcontroller.h
+    ../robot-control/diffcontroller.h \
+    ../robot-control/depthcontroller.h \
+    ../robot-control/verticalcontroller.h
 
 FORMS += widget.ui

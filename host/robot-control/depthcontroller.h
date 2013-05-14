@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QString>
-#include <QTimer>
 
 class DepthController : public QObject
 {
@@ -18,18 +17,14 @@ public:
 
     void SetTargetDepth(double tgDepth);
 
+    void QueryDepth();
+
 private:
     QTcpSocket *_socket;
-    QTimer timer;
     double depth, targetDepth;
     int vertSpeed;
 
-    void QueryDepth();
-
     void CalcSpeed();
-
-private slots:
-    void timerTick();
     
 signals:
     

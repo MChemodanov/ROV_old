@@ -277,3 +277,15 @@ void RobotControl::SetManualControl(bool state)
 {
     manualControl = state;
 }
+
+void RobotControl::SetPitchReg(bool state)
+{
+    if(initialized)
+        vertc->SetPitchReg(state);
+}
+
+void RobotControl::SetDepthReg(bool state)
+{
+    if(initialized)
+        vertc->SetDepthReg(state);
+}

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QTimer>
 
 #include "auto_ptr.h"
 
@@ -27,15 +28,24 @@ public:
 
     double GetPitch();
 
+    void SetPitchReg(bool state);
+
+    void SetDepthReg(bool state);
+
 private:
+    QTimer timer;
     std::auto_ptr<DepthController> depthc;
     std::auto_ptr<DiffController> diffc;
     QTcpSocket *socket;
     double targetDepth, targetPitch,
             realDepth, realPitch,
             fwSpeed, bwSpeed;
+    bool pitchReg, depthReg;
 
     void CalcData();
+
+private slots:
+    void TimerTick();
 
     
 signals:

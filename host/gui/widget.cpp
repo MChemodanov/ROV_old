@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
+#include <QTextCodec>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -12,6 +13,7 @@ Widget::Widget(QWidget *parent) :
     joystickEnabled(false),
     initialized(false)
 {
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
     ui->setupUi(this);
     LoadConfig("rc.cfg");
 
@@ -117,7 +119,11 @@ void Widget::on_horizontalSlider_valueChanged(int value)
 void Widget::on_verticalSlider_valueChanged(int value)
 {
     rc.SetVerticalSpeed(value);
-    rc.SetTargetDepth(int(value / 25.5));
+    double depth = int(value / 25.5) + 10;
+    rc.SetTargetDepth(depth);
+    ui->heightLabel->setText("Высота");
+    if(ui->autoHeightCheck->isChecked())
+        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(depth));
 }
 
 void Widget::timer_tick()
@@ -129,7 +135,7 @@ void Widget::timer_tick()
             em.SetSpeed(i, rc.GetSpeed(i)/2.55);
             em.SetReverse(i, rc.GetReverse(i));
         }
-        int depth = rc.GetDepth(), pitch = rc.GetPitch();
+        double depth = rc.GetDepth(), pitch = rc.GetPitch();
         ui->label_4->setText(QString("Depth: %1\nPitch: %2").arg(QString::number(depth)).arg(QString::number(pitch)));
 
         int hat = jc.GetHatState(0);
@@ -209,8 +215,25 @@ void Widget::on_pushButton_clicked()
         rc.CloseManip(ui->manipSpin->value());
 }
 
-void Widget::on_checkBox_4_stateChanged(int arg1)
+void Widget::on_autoPitchCheck_stateChanged(int arg1)
 {
     if(initialized)
+    {
+        rc.SetDepthReg(bool(arg1));
+    }
+}
+
+void Widget::on_autoHeightCheck_stateChanged(int arg1)
+{
+    int value = ui->verticalSlider->value();
+    double depth = int(value / 25.5) + 10;
+    if(initialized)
+    {
         rc.SetManualControl(! bool(arg1));
+        rc.SetTargetDepth(depth);
+        rc.SetDepthReg(bool(arg1));
+    }
+    ui->heightLabel->setText("Высота");
+    if(ui->autoHeightCheck->isChecked())
+        ui->heightLabel->setText(QString(tr("Высота\n%1 м")).arg(depth));
 }

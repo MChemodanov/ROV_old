@@ -57,6 +57,10 @@ public:
 
     void SetManualControl(bool state);
 
+    void SetPitchReg(bool state);
+
+    void SetDepthReg(bool state);
+
     bool EnginesStarted();
 
     void OpenManip(int commands);
