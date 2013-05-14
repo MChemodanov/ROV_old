@@ -19,6 +19,9 @@ int SixEnginesRC::Initialize(QString address, int port, int _engines, int _tickT
 
 void SixEnginesRC::CalcEnginesData()
 {
+    if (!initialized)
+        return;
+
     // 2     4
     //    0
     //    1
