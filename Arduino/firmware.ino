@@ -2,18 +2,30 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <LSM303.h>
+#include <Stepper.h>
 
 #define DEBUG
 
 #define ENGINE_COUNT 6
 #define REVERSE_PAUSE_MSEC 500
 
+#define QUERY_DEPTH_CMD 'd'
+#define QUERY_PITCH_CMD 'p'
+
+#define STEPS 200
+#define STEPPER_0 30
+#define STEPPER_1 31
+#define STEPPER_2 32
+#define STEPPER_3 33
+
+Stepper stepper(STEPS, STEPPER_0, STEPPER_1, STEPPER_2, STEPPER_3);
+
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168, 100, 2);
 EthernetServer server(80);
-
 EthernetClient client;
+LSM303 compass;
 
 class Engine
 {
@@ -53,6 +65,12 @@ void setup()
   Ethernet.begin(mac, ip);
   server.begin();
   
+  Wire.begin();
+  compass.init();
+  compass.enableDefault();
+  
+  stepper.setSpeed(300);
+    
   Serial.print("SMTU ROV v 1.2 firmvare\n"); 
 } 
 
@@ -127,6 +145,58 @@ void ParsePowerCmd(byte engineNum)
   } 
 }
 
+char query[10];
+void QueryAnswer(char cmd, float value)
+{
+  client.write("$q");
+  client.write(cmd);
+  dtostrf(value,2,1,query);
+  client.write(query); 
+  client.write("!\n\r");
+}
+
+char pitch[10]; 
+void AnswerPitch()
+{
+  compass.read();
+  float value = compass.a.y/1024.0;
+  if (abs(value) > 1)
+    value=value/abs(value);
+  QueryAnswer(QUERY_PITCH_CMD, asin(value)/3.1415*180);
+}
+
+void AnswerDepth()
+{
+  QueryAnswer(QUERY_DEPTH_CMD, 0);
+}
+
+void ParseQueryCmd()
+{
+  switch (buffer[2])
+  {
+    case QUERY_PITCH_CMD : AnswerPitch(); break;
+    case QUERY_DEPTH_CMD : AnswerDepth(); break;
+  }
+
+}
+
+#define MANIPULATOR_STEPS 200
+
+void MoveManipulator(char dir)
+{
+  switch (dir)
+  {
+    case '1' : stepper.step(MANIPULATOR_STEPS); break;
+    case '0' : stepper.step(-MANIPULATOR_STEPS); break;   
+  }
+  
+  digitalWrite(STEPPER_0, 0);
+  digitalWrite(STEPPER_1, 0);
+  digitalWrite(STEPPER_2, 0);
+  digitalWrite(STEPPER_3, 0);  
+}
+
+
 void ParseBuffer()
 {
   byte engineNum = buffer[2] - '0';
@@ -135,6 +205,8 @@ void ParseBuffer()
   {
     case 'r' : ParseReverseCmd(engineNum); break;
     case 'p' : ParsePowerCmd(engineNum); break; 
+    case 'q' : ParseQueryCmd(); break;
+    case 'm' : MoveManipulator(buffer[2]); break;
   }
 }
 
