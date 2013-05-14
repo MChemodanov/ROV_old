@@ -26,8 +26,16 @@ void DiffController::QueryPitch()
     if(_socket->waitForReadyRead(2000))
         string = _socket->readLine();
     //else emit error
-    if(string != "" && string.startsWith("$qp") && string.endsWith("!"))
-        pitch = string.mid(3, string.length() - 4).toDouble();
+    int begin = string.indexOf("$qp");
+    if (begin == -1)
+        return;
+    begin += 3;
+    int end = string.indexOf("!",begin);
+
+    if (end == -1)
+        return;
+
+    pitch = string.mid(begin, end-begin).toDouble();
 }
 
 void DiffController::CalcSpeeds()
