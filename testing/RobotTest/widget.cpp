@@ -1,7 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QMessageBox>
-#include <QDebug>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -57,15 +56,12 @@ void Widget::newConnectionNotify()
 
 void Widget::refresh()
 {
-    qDebug() << 1;
     if(!client)
     {
         client = server->nextPendingConnection();
 
         connect(client, SIGNAL(readyRead()), this, SLOT(refresh()));
-        qDebug() << 2;
     }
-    qDebug() << 3;
     char buffer[1024] = {0};
     if(client->isReadable())
         client->read(buffer, client->bytesAvailable());
