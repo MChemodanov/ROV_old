@@ -19,6 +19,8 @@ void VerticalController::TimerTick()
 {
     depthc->QueryDepth();
     diffc->QueryPitch();
+    realDepth = depthc->GetDepth();
+    realPitch = diffc->GetPitch();
 }
 
 void VerticalController::CalcData()
