@@ -49,6 +49,8 @@ public slots:
 
     void joystick_buttonPressed(int buttonId, bool state);
 
+    void joystick_hatChanged(int hatId, int state);
+
     void timer_tick();
 
     void RCDisconnected();

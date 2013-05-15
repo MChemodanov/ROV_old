@@ -96,6 +96,15 @@ void Widget::joystick_buttonPressed(int buttonId, bool state)
     }
 }
 
+void Widget::joystick_hatChanged(int hatId, int state)
+{
+    int value = ui->manipSpin->value();
+    if(state == jc.Up)
+        rc.OpenManip(value);
+    if(state == jc.Down)
+        rc.CloseManip(value);
+}
+
 void Widget::on_checkBox_stateChanged(int arg1)
 {
     joystickEnabled = arg1;
@@ -137,12 +146,6 @@ void Widget::timer_tick()
         }
         double depth = rc.GetDepth(), pitch = rc.GetPitch();
         ui->label_4->setText(QString("Depth: %1\nPitch: %2").arg(QString::number(depth)).arg(QString::number(pitch)));
-
-        int hat = jc.GetHatState(0);
-        if(hat == jc.Up)
-            rc.OpenManip(1);
-        if(hat == jc.Down)
-            rc.CloseManip(1);
     }
 }
 
