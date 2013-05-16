@@ -13,10 +13,10 @@
 #define QUERY_PITCH_CMD 'p'
 
 #define STEPS 200
-#define STEPPER_0 30
-#define STEPPER_1 31
-#define STEPPER_2 32
-#define STEPPER_3 33
+#define STEPPER_0 A10
+#define STEPPER_1 A11
+#define STEPPER_2 A12
+#define STEPPER_3 A13
 
 Stepper stepper(STEPS, STEPPER_0, STEPPER_1, STEPPER_2, STEPPER_3);
 
@@ -50,6 +50,11 @@ void SetupEngine (int engineNum, int powerPin, int reversePin)
   pinMode(reversePin, OUTPUT);   
   analogWrite(ENGINES[engineNum].powerPin, 0); 
   digitalWrite(ENGINES[engineNum].reversePin, LOW);
+  
+  pinMode(STEPPER_0, OUTPUT);
+  pinMode(STEPPER_1, OUTPUT);
+  pinMode(STEPPER_2, OUTPUT);
+  pinMode(STEPPER_3, OUTPUT);
 }
 
 void setup()  
@@ -167,7 +172,7 @@ void AnswerPitch()
 
 void AnswerDepth()
 {
-  QueryAnswer(QUERY_DEPTH_CMD, 0);
+  QueryAnswer(QUERY_DEPTH_CMD, analogRead(A0));
 }
 
 void ParseQueryCmd()
