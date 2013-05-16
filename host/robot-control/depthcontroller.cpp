@@ -9,6 +9,12 @@ DepthController::DepthController(QTcpSocket *socket, QObject *parent) :
         _socket = socket;
 }
 
+///For Honeywell 40PC015G1A
+double ConvertDepth(double data)
+{
+    return (data - 106)* 0.01272727;
+}
+
 void DepthController::QueryDepth()
 {
     if(!_socket->isWritable())
